@@ -1,68 +1,109 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
-import { ProgressBar } from '../components/ui/ProgressBar';
-import { FileText, CheckSquare, TrendingUp, Clock } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { FileText, CheckSquare, TrendingUp, Clock } from "lucide-react"
+import { useAuth } from "@/context/AuthContext"
 
 export function Dashboard() {
-  const { user } = useAuth();
+  const { user } = useAuth()
 
   const stats = [
-    { title: 'Tổng tài liệu', value: '12', icon: FileText, color: 'text-blue-600', bg: 'bg-blue-100' },
-    { title: 'Quiz đã làm', value: '24', icon: CheckSquare, color: 'text-green-600', bg: 'bg-green-100' },
-    { title: 'Điểm trung bình', value: '8.5', icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-100' },
-    { title: 'Giờ học tuần này', value: '14h', icon: Clock, color: 'text-orange-600', bg: 'bg-orange-100' },
-  ];
+    {
+      title: "Tổng tài liệu",
+      value: "12",
+      icon: FileText,
+      iconClass: "bg-primary/10 text-primary",
+    },
+    {
+      title: "Quiz đã làm",
+      value: "24",
+      icon: CheckSquare,
+      iconClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+    },
+    {
+      title: "Điểm trung bình",
+      value: "8.5",
+      icon: TrendingUp,
+      iconClass: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+    },
+    {
+      title: "Giờ học tuần này",
+      value: "14h",
+      icon: Clock,
+      iconClass: "bg-amber-500/10 text-amber-600 dark:text-amber-500",
+    },
+  ]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Chào mừng trở lại, {user?.name}! 👋</h1>
-        <p className="text-gray-500 mt-1">Dưới đây là tổng quan về tiến độ học tập của bạn.</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          Chào mừng trở lại, {user?.name}! 👋
+        </h1>
+        <p className="mt-1 text-muted-foreground">
+          Dưới đây là tổng quan về tiến độ học tập của bạn.
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, i) => (
           <Card key={i}>
-            <CardContent className="p-6 flex items-center space-x-4">
-              <div className={`p-3 rounded-full ${stat.bg}`}>
-                <stat.icon className={`h-6 w-6 ${stat.color}`} />
+            <CardContent className="flex items-center gap-4 pt-6">
+              <div
+                className={`flex size-12 shrink-0 items-center justify-center rounded-xl ${stat.iconClass}`}
+              >
+                <stat.icon className="size-6" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">{stat.title}</p>
-                <h3 className="text-2xl font-bold text-gray-900">{stat.value}</h3>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-muted-foreground">
+                  {stat.title}
+                </p>
+                <p className="text-2xl font-semibold tabular-nums text-foreground">
+                  {stat.value}
+                </p>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Tiến độ khóa học</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="font-medium text-gray-700">Nhập môn Trí tuệ nhân tạo</span>
-                <span className="text-gray-500">75%</span>
+              <div className="mb-2 flex justify-between text-sm">
+                <span className="font-medium text-foreground">
+                  Nhập môn Trí tuệ nhân tạo
+                </span>
+                <span className="tabular-nums text-muted-foreground">75%</span>
               </div>
-              <ProgressBar value={75} />
+              <Progress value={75} className="h-2" />
             </div>
             <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="font-medium text-gray-700">Cấu trúc dữ liệu & Giải thuật</span>
-                <span className="text-gray-500">40%</span>
+              <div className="mb-2 flex justify-between text-sm">
+                <span className="font-medium text-foreground">
+                  Cấu trúc dữ liệu & Giải thuật
+                </span>
+                <span className="tabular-nums text-muted-foreground">40%</span>
               </div>
-              <ProgressBar value={40} />
+              <Progress value={40} className="h-2" />
             </div>
             <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="font-medium text-gray-700">Lập trình Web Frontend</span>
-                <span className="text-gray-500">90%</span>
+              <div className="mb-2 flex justify-between text-sm">
+                <span className="font-medium text-foreground">
+                  Lập trình Web Frontend
+                </span>
+                <span className="tabular-nums text-muted-foreground">90%</span>
               </div>
-              <ProgressBar value={90} />
+              <Progress value={90} className="h-2" />
             </div>
           </CardContent>
         </Card>
@@ -71,20 +112,24 @@ export function Dashboard() {
           <CardHeader>
             <CardTitle>Gợi ý học tập từ AI</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                <h4 className="font-medium text-blue-900 mb-1">Ôn tập Cấu trúc dữ liệu</h4>
-                <p className="text-sm text-blue-700">Bạn có điểm số khá thấp ở phần Cây nhị phân. Hãy xem lại tài liệu và làm thêm 2 bài quiz nhé.</p>
-              </div>
-              <div className="p-4 bg-green-50 rounded-lg border border-green-100">
-                <h4 className="font-medium text-green-900 mb-1">Tiếp tục phát huy!</h4>
-                <p className="text-sm text-green-700">Bạn đã duy trì chuỗi học tập 5 ngày liên tiếp. Hôm nay hãy đọc thêm 1 chương tài liệu mới.</p>
-              </div>
-            </div>
+          <CardContent className="space-y-4">
+            <Alert className="border-primary/20 bg-primary/5">
+              <AlertTitle>Ôn tập Cấu trúc dữ liệu</AlertTitle>
+              <AlertDescription>
+                Bạn có điểm số khá thấp ở phần Cây nhị phân. Hãy xem lại tài
+                liệu và làm thêm 2 bài quiz nhé.
+              </AlertDescription>
+            </Alert>
+            <Alert className="border-emerald-500/20 bg-emerald-500/5">
+              <AlertTitle>Tiếp tục phát huy!</AlertTitle>
+              <AlertDescription>
+                Bạn đã duy trì chuỗi học tập 5 ngày liên tiếp. Hôm nay hãy đọc
+                thêm 1 chương tài liệu mới.
+              </AlertDescription>
+            </Alert>
           </CardContent>
         </Card>
       </div>
     </div>
-  );
+  )
 }
