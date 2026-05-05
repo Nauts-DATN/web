@@ -26,6 +26,25 @@ const API_ROUTES = {
     BASE: "/api/courses",
     BY_ID: (id: string) => `/api/courses/${id}`,
   },
+  AI: {
+    /** Lấy bản tóm tắt đã lưu (không gọi AI). */
+    SUMMARY: (id: string) => `/api/documents/${id}/summary`,
+    /** Gọi AI tóm tắt và lưu vào DB. */
+    SUMMARIZE: (id: string) => `/api/documents/${id}/summarize`,
+    /** Gọi AI tạo quiz và lưu vào DB. */
+    GENERATE_QUIZ: (id: string) => `/api/documents/${id}/quiz`,
+    /** Danh sách quiz của document. */
+    QUIZZES_BY_DOC: (id: string) => `/api/documents/${id}/quizzes`,
+    /** Danh sách tất cả quiz của người dùng hiện tại. */
+    QUIZZES: "/api/quizzes",
+    /** Chi tiết / xóa một quiz theo id. */
+    QUIZ_BY_ID: (id: string) => `/api/quizzes/${id}`,
+  },
+  NOTES: {
+    BASE: "/api/notes",
+    BY_ID: (id: string) => `/api/notes/${id}`,
+    BY_DOCUMENT: (id: string) => `/api/documents/${id}/note`,
+  },
 } as const
 
 export default API_ROUTES
