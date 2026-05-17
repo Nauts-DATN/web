@@ -6,3 +6,8 @@ export type Course = {
     updatedAt: string;
 };
 
+export type CourseBody = {
+    name: string;
+    description?: string;
+};
+

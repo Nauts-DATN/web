@@ -100,14 +100,14 @@ export function MainLayout() {
                     <SidebarMenuButton asChild tooltip="Course">
                       <Link to="/community-documents">
                         <Globe />
-                        <span>Tài liệu cộng đồng</span>
+                        <span>Cộng đồng</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
 
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild tooltip="Course">
-                      <Link to="/documents">
+                      <Link to="/library">
                         <FileText />
                         <span>Thư Viện</span>
                       </Link>

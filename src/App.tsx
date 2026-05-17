@@ -21,6 +21,7 @@ import { Profile } from "@/pages/Profile"
 import { CommunityDocuments } from "@/pages/CommunityDocuments"
 import { Toaster } from "@/components/ui/sonner"
 import { TanStackDevtools } from "@tanstack/react-devtools"
+import { Library } from "./pages/Library"
 
 export default function App() {
   return (
@@ -40,6 +41,7 @@ export default function App() {
               <Route path="/community-documents" element={<CommunityDocuments />} />
               <Route path="/documents/:id" element={<DocumentDetail />} />
               <Route path="/community-documents/:id" element={<CommunityDocDetail/>} />
+              <Route path="/library" element={<Library />} />
               <Route path="/notes" element={<Notes />} />
               <Route path="/quiz" element={<QuizList />} />
               <Route path="/quiz/:id" element={<QuizTake />} />

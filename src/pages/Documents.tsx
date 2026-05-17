@@ -50,6 +50,7 @@ import {
 } from "@/hooks/queries/document-hooks"
 import { useCategories } from "@/hooks/queries/category-hooks"
 import { useCourses } from "@/hooks/queries/course-hooks"
+import type { Document as LearningDocument } from "@/types/db/document"
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
@@ -284,6 +285,8 @@ export function Documents() {
   const navigate = useNavigate()
   const [search, setSearch] = useState("")
   const [uploadOpen, setUploadOpen] = useState(false)
+  const [documentToDelete, setDocumentToDelete] =
+    useState<LearningDocument | null>(null)
 
   const { data, isLoading, isError } = useDocuments()
   const deleteMutation = useDeleteDocument()
@@ -304,6 +307,13 @@ export function Documents() {
 
   function getCourseName(id?: string) {
     return allCourses.find((c) => c.id === id)?.name
+  }
+
+  function confirmDeleteDocument() {
+    if (!documentToDelete) return
+    deleteMutation.mutate(documentToDelete.id, {
+      onSuccess: () => setDocumentToDelete(null),
+    })
   }
 
   return (
@@ -342,13 +352,16 @@ export function Documents() {
 
       {/* Loading */}
       {isLoading && (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-2.5">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card key={i}>
-              <CardContent className="p-5 space-y-3">
-                <Skeleton className="h-12 w-12 rounded-xl" />
-                <Skeleton className="h-5 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
+              <CardContent className="flex items-center gap-3 p-3">
+                <Skeleton className="size-9 rounded-md" />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <Skeleton className="h-4 w-2/3" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+                <Skeleton className="size-8 rounded-md" />
               </CardContent>
             </Card>
           ))}
@@ -379,15 +392,15 @@ export function Documents() {
 
       {/* Grid */}
       {!isLoading && documents.length > 0 && (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-2.5">
           {documents.map((doc) => (
             <Card key={doc.id} className="transition-shadow hover:shadow-md">
-              <CardContent className="p-5">
+              <CardContent className="p-3">
                 {/* Chỉ vùng nội dung mới mở chi tiết — tránh click Xóa / menu kích hoạt navigate */}
                 <div
                   role="link"
                   tabIndex={0}
-                  className="cursor-pointer rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="flex cursor-pointer items-center gap-3 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   onClick={() => navigate(`/documents/${doc.id}`)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
@@ -396,12 +409,12 @@ export function Documents() {
                     }
                   }}
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="rounded-xl bg-primary/10 p-3">
-                      <FileText className="size-6 text-primary" />
+                  <div className="contents">
+                    <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-primary/10">
+                      <FileText className="size-4 text-primary" />
                     </div>
                     <div
-                      className="shrink-0"
+                      className="order-last shrink-0"
                       onClick={(e) => e.stopPropagation()}
                       onPointerDown={(e) => e.stopPropagation()}
                       onKeyDown={(e) => e.stopPropagation()}
@@ -415,7 +428,7 @@ export function Documents() {
                             className="text-muted-foreground"
                             aria-label="Thao tác tài liệu"
                           >
-                            <MoreVertical className="size-5" />
+                            <MoreVertical className="size-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -433,7 +446,7 @@ export function Documents() {
                           <DropdownMenuItem
                             variant="destructive"
                             disabled={deleteMutation.isPending}
-                            onSelect={() => deleteMutation.mutate(doc.id)}
+                            onSelect={() => setDocumentToDelete(doc)}
                           >
                             Xóa
                           </DropdownMenuItem>
@@ -442,7 +455,7 @@ export function Documents() {
                     </div>
                   </div>
 
-                  <div className="mt-4">
+                  <div className="mt-4 min-w-0 flex-1">
                     <p className="line-clamp-2 text-base font-semibold text-foreground">
                       {doc.title}
                     </p>
@@ -477,6 +490,47 @@ export function Documents() {
       )}
 
       <UploadDialog open={uploadOpen} onOpenChange={setUploadOpen} />
+
+      <Dialog
+        open={!!documentToDelete}
+        onOpenChange={(open) => {
+          if (!open) setDocumentToDelete(null)
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Xóa tài liệu?</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-3 text-sm text-muted-foreground">
+            <p className="font-medium text-foreground">
+              {documentToDelete?.title}
+            </p>
+            <p>
+              Xóa tài liệu này đồng nghĩa với tất cả ghi chú và bài tập liên quan
+              tài liệu này cũng bị xóa, bạn chắc chứ?
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDocumentToDelete(null)}
+            >
+              Hủy
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deleteMutation.isPending}
+              onClick={confirmDeleteDocument}
+            >
+              {deleteMutation.isPending ? "Đang xóa..." : "Xóa"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
