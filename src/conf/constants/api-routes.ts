@@ -14,7 +14,9 @@ const API_ROUTES = {
   },
   DOCUMENTS: {
     BASE: "/api/documents",
+    COMMUNITY: "/api/documents/community",
     BY_ID: (id: string) => `/api/documents/${id}`,
+    VISIBILITY: (id: string) => `/api/documents/${id}/visibility`,
     DOWNLOAD: (id: string) => `/api/documents/${id}/download`,
     PRESIGNED_URL: (id: string) => `/api/documents/${id}/presigned-url`,
   },

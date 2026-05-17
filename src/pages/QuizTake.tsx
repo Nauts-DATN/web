@@ -23,33 +23,34 @@ type QuizState = {
   questions: QuizQuestion[]
 }
 
-const MOCK_QUIZ: QuizState = {
-  id: "mock",
-  title: "Kiểm tra kiến thức ReactJS",
-  questionType: "multiple_choice",
-  questions: [
-    {
-      id: "q1",
-      type: "multiple_choice",
-      text: "React là gì?",
-      options: ["Một framework", "Một thư viện", "Một ngôn ngữ", "Một hệ điều hành"],
-      answer: 1,
-    },
-    {
-      id: "q2",
-      type: "multiple_choice",
-      text: "Hook nào dùng để quản lý state?",
-      options: ["useEffect", "useContext", "useState", "useReducer"],
-      answer: 2,
-    },
-  ],
-}
+// const MOCK_QUIZ: QuizState = {
+//   id: "mock",
+//   title: "Kiểm tra kiến thức ReactJS",
+//   questionType: "multiple_choice",
+//   questions: [
+//     {
+//       id: "q1",
+//       type: "multiple_choice",
+//       text: "React là gì?",
+//       options: ["Một framework", "Một thư viện", "Một ngôn ngữ", "Một hệ điều hành"],
+//       answer: 1,
+//     },
+//     {
+//       id: "q2",
+//       type: "multiple_choice",
+//       text: "Hook nào dùng để quản lý state?",
+//       options: ["useEffect", "useContext", "useState", "useReducer"],
+//       answer: 2,
+//     },
+//   ],
+// }
 
 export function QuizTake() {
   useParams()
   const navigate = useNavigate()
   const location = useLocation()
-  const quizData: QuizState = location.state?.quiz ?? MOCK_QUIZ
+  console.log("Location:", location.state);
+  const quizData: QuizState = location.state?.quiz 
 
   const isEssay = quizData.questionType === "essay"
 

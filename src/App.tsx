@@ -13,10 +13,12 @@ import { Dashboard } from "@/pages/Dashboard"
 import { Documents } from "@/pages/Documents"
 import { DocumentDetail } from "@/pages/DocumentDetail"
 import { Notes } from "@/pages/Notes"
+import {CommunityDocDetail} from "@/pages/CommunityDocDetail"
 import { QuizList } from "@/pages/QuizList"
 import { QuizTake } from "@/pages/QuizTake"
 import { Progress } from "@/pages/Progress"
 import { Profile } from "@/pages/Profile"
+import { CommunityDocuments } from "@/pages/CommunityDocuments"
 import { Toaster } from "@/components/ui/sonner"
 import { TanStackDevtools } from "@tanstack/react-devtools"
 
@@ -35,7 +37,9 @@ export default function App() {
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/documents" element={<Documents />} />
+              <Route path="/community-documents" element={<CommunityDocuments />} />
               <Route path="/documents/:id" element={<DocumentDetail />} />
+              <Route path="/community-documents/:id" element={<CommunityDocDetail/>} />
               <Route path="/notes" element={<Notes />} />
               <Route path="/quiz" element={<QuizList />} />
               <Route path="/quiz/:id" element={<QuizTake />} />

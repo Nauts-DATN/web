@@ -4,6 +4,7 @@ export type Document = {
   id: string
   title: string
   description?: string
+  isPublic: boolean
   uploadedBy: string
   category?: string
   course?: string
@@ -31,3 +32,4 @@ export type SummaryResult = {
 export type DocumentListRes = ApiResponse<{ documents: Document[] }>
 export type DocumentRes = ApiResponse<{ document: Document }>
 export type SummaryRes = ApiResponse<SummaryResult>
+export type SetVisibilityRes = ApiResponse<{ document: Document }>

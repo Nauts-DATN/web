@@ -8,6 +8,7 @@ import {
   TrendingUp,
   User,
   LogOut,
+  Globe
 } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 import {
@@ -29,7 +30,7 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Tài liệu", href: "/documents", icon: FileText },
+  { name: "Tài liệu của tôi", href: "/documents", icon: FileText },
   { name: "Ghi chú", href: "/notes", icon: PenTool },
   { name: "Luyện tập", href: "/quiz", icon: CheckSquare },
   { name: "Tiến độ", href: "/progress", icon: TrendingUp },
@@ -92,14 +93,23 @@ export function MainLayout() {
             </SidebarGroup>
           </SidebarContent>
           <SidebarContent >
-            <SidebarGroup>
+            <SidebarGroup className="border-t border-sidebar-border">
               <SidebarGroupContent>
-                <SidebarMenu>
+                <SidebarMenu className="flex flex-col gap-4">
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild tooltip="Course">
-                      <Link to="/profile">
-                        <User />
-                        <span>Course</span>
+                      <Link to="/community-documents">
+                        <Globe />
+                        <span>Tài liệu cộng đồng</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild tooltip="Course">
+                      <Link to="/documents">
+                        <FileText />
+                        <span>Thư Viện</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

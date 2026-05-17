@@ -31,6 +31,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Search,
@@ -41,7 +42,12 @@ import {
   CloudUpload,
   X,
 } from "lucide-react"
-import { useDocuments, useUploadDocument, useDeleteDocument } from "@/hooks/queries/document-hooks"
+import {
+  useDocuments,
+  useUploadDocument,
+  useDeleteDocument,
+  useSetDocumentVisibility,
+} from "@/hooks/queries/document-hooks"
 import { useCategories } from "@/hooks/queries/category-hooks"
 import { useCourses } from "@/hooks/queries/course-hooks"
 
@@ -73,6 +79,7 @@ function UploadDialog({ open, onOpenChange }: UploadDialogProps) {
   const [description, setDescription] = useState("")
   const [categoryId, setCategoryId] = useState("")
   const [courseId, setCourseId] = useState("")
+  const [isPublic, setIsPublic] = useState(false)
   const [dragOver, setDragOver] = useState(false)
 
   const { data: catData } = useCategories()
@@ -88,6 +95,7 @@ function UploadDialog({ open, onOpenChange }: UploadDialogProps) {
     setDescription("")
     setCategoryId("")
     setCourseId("")
+    setIsPublic(false)
     setDragOver(false)
   }
 
@@ -118,6 +126,7 @@ function UploadDialog({ open, onOpenChange }: UploadDialogProps) {
       description: description.trim() || undefined,
       category: categoryId || undefined,
       course: courseId || undefined,
+      isPublic,
     })
 
     handleClose()
@@ -239,6 +248,16 @@ function UploadDialog({ open, onOpenChange }: UploadDialogProps) {
             </div>
           </div>
 
+          <div className="flex items-center justify-between rounded-lg border p-3">
+            <div>
+              <p className="text-sm font-medium">Public lên cộng đồng</p>
+              <p className="text-xs text-muted-foreground">
+                Người dùng khác có thể tìm kiếm, xem và tải tài liệu này.
+              </p>
+            </div>
+            <Switch checked={isPublic} onCheckedChange={setIsPublic} />
+          </div>
+
           {uploadMutation.isError && (
             <p className="text-sm text-destructive">
               Tải lên thất bại. Vui lòng thử lại.
@@ -268,6 +287,7 @@ export function Documents() {
 
   const { data, isLoading, isError } = useDocuments()
   const deleteMutation = useDeleteDocument()
+  const visibilityMutation = useSetDocumentVisibility()
   const { data: catData } = useCategories()
   const { data: courseData } = useCourses()
 
@@ -399,15 +419,16 @@ export function Documents() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem asChild>
-                            <a
-                              href={doc.presignedUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              Tải xuống
-                            </a>
+                          <DropdownMenuItem
+                            disabled={visibilityMutation.isPending}
+                            onSelect={() =>
+                              visibilityMutation.mutate({
+                                id: doc.id,
+                                isPublic: !doc.isPublic,
+                              })
+                            }
+                          >
+                            {doc.isPublic ? "Gỡ khỏi cộng đồng" : "Đăng lên cộng đồng"}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             variant="destructive"
@@ -439,6 +460,7 @@ export function Documents() {
                       {getCourseName(doc.course) && (
                         <Badge variant="outline">{getCourseName(doc.course)}</Badge>
                       )}
+                      {doc.isPublic && <Badge variant="default">Cộng đồng</Badge>}
                       <span className="text-xs text-muted-foreground">
                         {formatBytes(doc.fileSize)}
                       </span>
