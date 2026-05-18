@@ -5,6 +5,7 @@ import {
   FileText,
   PenTool,
   CheckSquare,
+  BookOpenCheck,
   TrendingUp,
   User,
   LogOut,
@@ -33,6 +34,7 @@ const navigation = [
   { name: "Tài liệu của tôi", href: "/documents", icon: FileText },
   { name: "Ghi chú", href: "/notes", icon: PenTool },
   { name: "Luyện tập", href: "/quiz", icon: CheckSquare },
+  { name: "Roadmap", href: "/roadmaps", icon: BookOpenCheck },
   { name: "Tiến độ", href: "/progress", icon: TrendingUp },
 ]
 

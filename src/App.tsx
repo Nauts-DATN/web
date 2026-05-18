@@ -19,6 +19,8 @@ import { QuizTake } from "@/pages/QuizTake"
 import { Progress } from "@/pages/Progress"
 import { Profile } from "@/pages/Profile"
 import { CommunityDocuments } from "@/pages/CommunityDocuments"
+import { Roadmaps } from "@/pages/Roadmaps"
+import { RoadmapDetail } from "@/pages/RoadmapDetail"
 import { Toaster } from "@/components/ui/sonner"
 import { TanStackDevtools } from "@tanstack/react-devtools"
 import { Library } from "./pages/Library"
@@ -45,6 +47,8 @@ export default function App() {
               <Route path="/notes" element={<Notes />} />
               <Route path="/quiz" element={<QuizList />} />
               <Route path="/quiz/:id" element={<QuizTake />} />
+              <Route path="/roadmaps" element={<Roadmaps />} />
+              <Route path="/roadmaps/:id" element={<RoadmapDetail />} />
               <Route path="/progress" element={<Progress />} />
               <Route path="/profile" element={<Profile />} />
             </Route>

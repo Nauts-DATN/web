@@ -47,6 +47,14 @@ const API_ROUTES = {
     BY_ID: (id: string) => `/api/notes/${id}`,
     BY_DOCUMENT: (id: string) => `/api/documents/${id}/note`,
   },
+  ROADMAPS: {
+    BASE: "/api/roadmaps",
+    BY_ID: (id: string) => `/api/roadmaps/${id}`,
+    TASKS: (id: string) => `/api/roadmaps/${id}/tasks`,
+    TASK_BY_ID: (taskId: string) => `/api/roadmaps/tasks/${taskId}`,
+    TASK_COMPLETE: (taskId: string) => `/api/roadmaps/tasks/${taskId}/complete`,
+    TASK_DOCUMENT: (taskId: string) => `/api/roadmaps/tasks/${taskId}/document`,
+  },
 } as const
 
 export default API_ROUTES
