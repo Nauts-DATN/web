@@ -48,6 +48,7 @@ interface AuthContextType {
   loading: boolean
   login: (email: string, password: string) => Promise<void>
   register: (name: string, email: string, password: string) => Promise<AuthRes>
+  updateUser: (patch: Partial<User>) => void
   logout: () => void
 }
 
@@ -100,6 +101,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [registerMutation],
   )
 
+  const updateUser = useCallback((patch: Partial<User>) => {
+    setAuthState((current) => {
+      const nextUser = current.user ? { ...current.user, ...patch } : patch
+      Persistence.setItem(AUTH_USER_KEY, nextUser)
+      return {
+        ...current,
+        user: nextUser,
+        isAuthenticated: !!(current.token && nextUser),
+        requiresEmailVerification: nextUser.emailVerified === false,
+      }
+    })
+  }, [])
+
   const logout = useCallback(() => {
     clearAuthData()
     queryClient.removeQueries({ queryKey: authKeys.root })
@@ -120,9 +134,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loading,
       login,
       register,
+      updateUser,
       logout,
     }),
-    [authState, loading, login, register, logout],
+    [authState, loading, login, register, updateUser, logout],
   )
 
   return (

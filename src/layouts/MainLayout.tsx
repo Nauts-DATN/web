@@ -36,6 +36,7 @@ const navigation = [
   { name: "Luyện tập", href: "/quiz", icon: CheckSquare },
   { name: "Roadmap", href: "/roadmaps", icon: BookOpenCheck },
   { name: "Tiến độ", href: "/progress", icon: TrendingUp },
+  { name: "Thư Viện", href: "/library", icon: FileText },
 ]
 
 export function MainLayout() {
@@ -90,31 +91,6 @@ export function MainLayout() {
                       </SidebarMenuItem>
                     )
                   })}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
-          <SidebarContent >
-            <SidebarGroup className="border-t border-sidebar-border">
-              <SidebarGroupContent>
-                <SidebarMenu className="flex flex-col gap-4">
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild tooltip="Course">
-                      <Link to="/community-documents">
-                        <Globe />
-                        <span>Cộng đồng</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild tooltip="Course">
-                      <Link to="/library">
-                        <FileText />
-                        <span>Thư Viện</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>

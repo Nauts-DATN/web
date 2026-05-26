@@ -40,9 +40,9 @@ export default function App() {
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/documents" element={<Documents />} />
-              <Route path="/community-documents" element={<CommunityDocuments />} />
+              {/* <Route path="/community-documents" element={<CommunityDocuments />} /> */}
               <Route path="/documents/:id" element={<DocumentDetail />} />
-              <Route path="/community-documents/:id" element={<CommunityDocDetail/>} />
+              {/* <Route path="/community-documents/:id" element={<CommunityDocDetail/>} /> */}
               <Route path="/library" element={<Library />} />
               <Route path="/notes" element={<Notes />} />
               <Route path="/quiz" element={<QuizList />} />

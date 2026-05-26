@@ -12,6 +12,12 @@ const API_ROUTES = {
     RESEND_VERIFICATION: "/api/auth/resend-verification",
     LOGOUT: "/api/auth/logout",
   },
+  USERS: {
+    UPDATE_NAME: "/api/users/update-name",
+    UPDATE_AVATAR: "/api/users/update-avatar",
+    UPDATE_PASSWORD: "/api/users/update-password",
+    AVATAR: (id: string) => `/api/users/${id}/avatar`,
+  },
   DOCUMENTS: {
     BASE: "/api/documents",
     COMMUNITY: "/api/documents/community",
