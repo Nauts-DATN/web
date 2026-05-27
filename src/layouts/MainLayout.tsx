@@ -35,7 +35,7 @@ const navigation = [
   { name: "Ghi chú", href: "/notes", icon: PenTool },
   { name: "Luyện tập", href: "/quiz", icon: CheckSquare },
   { name: "Roadmap", href: "/roadmaps", icon: BookOpenCheck },
-  { name: "Tiến độ", href: "/progress", icon: TrendingUp },
+  // { name: "Tiến độ", href: "/progress", icon: TrendingUp },
   { name: "Thư Viện", href: "/library", icon: FileText },
 ]
 

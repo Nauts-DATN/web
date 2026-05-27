@@ -53,7 +53,7 @@ export default function App() {
               <Route path="/quiz/:id" element={<QuizTake />} />
               <Route path="/roadmaps" element={<Roadmaps />} />
               <Route path="/roadmaps/:id" element={<RoadmapDetail />} />
-              <Route path="/progress" element={<Progress />} />
+              {/* <Route path="/progress" element={<Progress />} /> */}
               <Route path="/profile" element={<Profile />} />
             </Route>
 
