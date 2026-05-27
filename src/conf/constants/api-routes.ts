@@ -13,6 +13,9 @@ const API_ROUTES = {
     LOGOUT: "/api/auth/logout",
   },
   USERS: {
+    BASE: "/api/users",
+    BY_ID: (id: string) => `/api/users/${id}`,
+    BLOCK: (id: string) => `/api/users/${id}/block`,
     UPDATE_NAME: "/api/users/update-name",
     UPDATE_AVATAR: "/api/users/update-avatar",
     UPDATE_PASSWORD: "/api/users/update-password",

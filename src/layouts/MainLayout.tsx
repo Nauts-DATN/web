@@ -46,6 +46,9 @@ export function MainLayout() {
   if (!user) {
     return <Navigate to="/login" replace />
   }
+  if(user.role === "admin") {
+    return <Navigate to="/admin" replace />
+  }
 
   return (
     <TooltipProvider delayDuration={0}>

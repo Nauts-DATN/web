@@ -10,8 +10,37 @@ export type UpdateAvatarRes = ApiResponse<{
   publicUrl: string
 }>
 export type UpdatePasswordRes = ApiResponse<{ message: string }>
+export type UserListRes = ApiResponse<User[]>
+export type UserRes = ApiResponse<User>
+export type AdminUserMutationRes = ApiResponse<{ user: User }>
+export type DeleteUserRes = ApiResponse<{ message: string }>
 
 const userService = {
+  listUsers: async (search?: string): Promise<UserListRes> => {
+    const res = await api.get(API_ROUTES.USERS.BASE, {
+      params: { search: search?.trim() || undefined },
+    })
+    return res.data
+  },
+
+  getById: async (id: string): Promise<UserRes> => {
+    const res = await api.get(API_ROUTES.USERS.BY_ID(id))
+    return res.data
+  },
+
+  setBlocked: async (
+    id: string,
+    isBlocked: boolean,
+  ): Promise<AdminUserMutationRes> => {
+    const res = await api.patch(API_ROUTES.USERS.BLOCK(id), { isBlocked })
+    return res.data
+  },
+
+  deleteById: async (id: string): Promise<DeleteUserRes> => {
+    const res = await api.delete(API_ROUTES.USERS.BY_ID(id))
+    return res.data
+  },
+
   updateUserName: async (name: string): Promise<UpdateUserNameRes> => {
     const res = await api.patch(API_ROUTES.USERS.UPDATE_NAME, { name })
     return res.data

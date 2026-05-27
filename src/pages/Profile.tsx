@@ -16,19 +16,34 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User, Mail, Camera } from "lucide-react"
+import { Mail, Camera, MailMinus } from "lucide-react"
 import { toast } from "sonner"
 import {
   useUpdateUserAvatar,
   useUpdateUserName,
   useUpdateUserPassword,
 } from "@/hooks/queries/user-hooks"
+import type { User } from "@/types/db/user"
+import API_ROUTES from "@/conf/constants/api-routes"
 
 function getErrorMessage(error: unknown, fallback: string) {
   if (isAxiosError(error)) {
     return (error.response?.data as { error?: string })?.error ?? error.message
   }
   return fallback
+}
+
+function resolveAvatarSrc(user?: Partial<User> | null) {
+  if (!user?.avatar) return ""
+  if (
+    user.avatar.startsWith("http://") ||
+    user.avatar.startsWith("https://") ||
+    user.avatar.startsWith("blob:") ||
+    user.avatar.startsWith("data:")
+  ) {
+    return user.avatar
+  }
+  return user.id ? API_ROUTES.USERS.AVATAR(user.id) : ""
 }
 
 
@@ -41,9 +56,8 @@ export function Profile() {
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [avatarUrl, setAvatarUrl] = useState(
-      (user?.avatar),
+      resolveAvatarSrc(user),
   )
-  console.log("User data in Profile:", user) // Debug log to check user data
 
   const updateNameMutation = useUpdateUserName()
   const updateAvatarMutation = useUpdateUserAvatar()
@@ -95,7 +109,7 @@ export function Profile() {
       }
       URL.revokeObjectURL(previewUrl)
     } catch (error) {
-      setAvatarUrl((user?.avatar))
+      setAvatarUrl(resolveAvatarSrc(user))
       toast.error(getErrorMessage(error, "Không thể cập nhật ảnh đại diện"))
     }
   }
@@ -156,6 +170,7 @@ export function Profile() {
                     <User className="size-16 text-muted-foreground" />
                   </AvatarFallback> */}
                 </Avatar>
+                
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -184,7 +199,7 @@ export function Profile() {
                 <FieldLabel htmlFor="profile-name">Họ và tên</FieldLabel>
                 <InputGroup>
                   <InputGroupAddon>
-                    <User className="text-muted-foreground" />
+                    <Mail className="text-muted-foreground" />
                   </InputGroupAddon>
                   <InputGroupInput
                     id="profile-name"

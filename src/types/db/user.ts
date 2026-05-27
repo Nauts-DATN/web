@@ -11,6 +11,7 @@ export type User = {
     name: string;
     avatar?: string;
     role: UserRole;
+    isBlocked: boolean;
     emailVerified: boolean;
     createdAt: string | Date;
     updatedAt: string | Date;

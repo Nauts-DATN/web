@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { AuthProvider } from "@/context/AuthContext"
 import { AuthLayout } from "@/layouts/AuthLayout"
 import { MainLayout } from "@/layouts/MainLayout"
+import { AdminLayout } from "@/layouts/AdminLayout"
 import { Login } from "@/pages/Login"
 import { Register } from "@/pages/Register"
 import { Dashboard } from "@/pages/Dashboard"
@@ -21,6 +22,9 @@ import { Profile } from "@/pages/Profile"
 import { CommunityDocuments } from "@/pages/CommunityDocuments"
 import { Roadmaps } from "@/pages/Roadmaps"
 import { RoadmapDetail } from "@/pages/RoadmapDetail"
+import { AdminDashboard } from "@/pages/AdminDashboard"
+import { AdminUsers } from "@/pages/AdminUsers"
+import { AdminCategories } from "@/pages/AdminCategories"
 import { Toaster } from "@/components/ui/sonner"
 import { TanStackDevtools } from "@tanstack/react-devtools"
 import { Library } from "./pages/Library"
@@ -51,6 +55,12 @@ export default function App() {
               <Route path="/roadmaps/:id" element={<RoadmapDetail />} />
               <Route path="/progress" element={<Progress />} />
               <Route path="/profile" element={<Profile />} />
+            </Route>
+
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="categories" element={<AdminCategories />} />
             </Route>
           </Routes>
           <Toaster position="top-right" richColors />
