@@ -67,7 +67,6 @@ export function AdminDashboard() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [name, setName] = useState(user?.name || "")
   const [avatarUrl, setAvatarUrl] = useState(resolveAvatarSrc(user))
-  console.log(avatarUrl)
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
