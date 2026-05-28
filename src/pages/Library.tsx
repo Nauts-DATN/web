@@ -1,5 +1,14 @@
-import { useMemo, useState } from "react"
+import { useMemo, useState, type FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
+import { isAxiosError } from "axios"
+import { toast } from "sonner"
+import {
+  BookOpen,
+  FileText,
+  FolderOpen,
+  Plus,
+  Trash2,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -26,9 +35,6 @@ import {
   useCreateCourse,
   useDeleteCourse,
 } from "@/hooks/queries/course-hooks"
-import { FileText, Folder, Plus, X } from "lucide-react"
-import { toast } from "sonner"
-import { isAxiosError } from "axios"
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
@@ -55,13 +61,23 @@ export function Library() {
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
 
-  const { data: coursesRes, isLoading: isLoadingCourses } = useCourses()
-  const { data: docsRes, isLoading: isLoadingDocuments } = useDocuments()
+  const {
+    data: coursesRes,
+    isLoading: isLoadingCourses,
+    isError: isCoursesError,
+  } = useCourses()
+  const {
+    data: docsRes,
+    isLoading: isLoadingDocuments,
+    isError: isDocumentsError,
+  } = useDocuments()
   const createCourse = useCreateCourse()
   const deleteCourse = useDeleteCourse()
 
   const courses = coursesRes?.isSuccess ? (coursesRes.data?.courses ?? []) : []
   const allDocuments = docsRes?.isSuccess ? (docsRes.data?.documents ?? []) : []
+  const isLoading = isLoadingCourses || isLoadingDocuments
+  const isError = isCoursesError || isDocumentsError
 
   const documentsByCourse = useMemo(() => {
     const map = new Map<string, typeof allDocuments>()
@@ -85,7 +101,7 @@ export function Library() {
     setDescription("")
   }
 
-  const handleCreateCourse = async (e: React.FormEvent) => {
+  const handleCreateCourse = async (e: FormEvent) => {
     e.preventDefault()
     const trimmedName = name.trim()
     if (!trimmedName) {
@@ -112,7 +128,9 @@ export function Library() {
   const requestDeleteCourse = (course: { id: string; name: string }) => {
     const documentCount = documentsByCourse.get(course.id)?.length ?? 0
     if (documentCount > 0) {
-      toast.error(`Không thể xóa course này vì đang có ${documentCount} tài liệu.`)
+      toast.error(
+        `Không thể xóa course này vì đang có ${documentCount} tài liệu.`,
+      )
       return
     }
     setCourseToDelete(course)
@@ -136,136 +154,150 @@ export function Library() {
 
   return (
     <div className="space-y-8">
-      <section className="space-y-5">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          My courses
-        </h1>
-
-        {isLoadingCourses || isLoadingDocuments ? (
-          <div className="space-y-4">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <Card key={index}>
-                <CardContent className="flex items-center gap-4 p-5">
-                  <Skeleton className="size-11 rounded-md" />
-                  <div className="min-w-0 flex-1 space-y-2">
-                    <Skeleton className="h-5 w-52" />
-                    <Skeleton className="h-4 w-36" />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : courses.length === 0 ? (
-          <div className="rounded-xl border border-dashed py-16 text-center text-muted-foreground">
-            Chưa có course nào.
-          </div>
-        ) : (
-          <Accordion type="multiple" className="gap-4">
-            {courses.map((course) => {
-              const documents = documentsByCourse.get(course.id) ?? []
-              return (
-                <Card
-                  key={course.id}
-                  className="overflow-hidden transition-shadow hover:shadow-md"
-                >
-                  <AccordionItem value={course.id} className="border-b-0">
-                      <AccordionTrigger className="px-5 py-4 hover:no-underline">
-                        <div className="flex min-w-0 flex-1 items-start gap-4 pr-4">
-                          <div className="flex size-11 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                            <Folder className="size-5 fill-[#26bf12] text-[#26bf12]" />
-                          </div>
-                          <div className="min-w-0 space-y-1 text-left">
-                            <h3 className="truncate text-base font-semibold text-foreground">
-                              {course.name}
-                            </h3>
-                            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                              <Badge variant="secondary">
-                                {documents.length} tài liệu
-                              </Badge>
-                              {course.description && (
-                                <span className="truncate">
-                                  {course.description}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        className="mr-4 mt-4 shrink-0 text-muted-foreground hover:text-destructive"
-                        disabled={deleteCourse.isPending}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          requestDeleteCourse(course)
-                        }}
-                        aria-label="Xóa course"
-                      >
-                        <X className="size-5" />
-                      </Button>
-                      </AccordionTrigger>
-
-                      
-
-                    <AccordionContent className="px-5 pb-5">
-                      <div className="space-y-3 border-t pt-4">
-                        {documents.length === 0 ? (
-                          <div className="rounded-lg border border-dashed py-8 text-center text-sm text-muted-foreground">
-                            Course này chưa có tài liệu.
-                          </div>
-                        ) : (
-                          documents.map((doc) => (
-                            <div
-                              key={doc.id}
-                              role="button"
-                              tabIndex={0}
-                              className="flex cursor-pointer items-center gap-3 rounded-lg border bg-background p-4 outline-none transition-colors hover:bg-muted/30 focus-visible:ring-2 focus-visible:ring-ring"
-                              onClick={() => navigate(`/documents/${doc.id}`)}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter" || e.key === " ") {
-                                  e.preventDefault()
-                                  navigate(`/documents/${doc.id}`)
-                                }
-                              }}
-                            >
-                              <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-primary/10">
-                                <FileText className="size-4 text-primary" />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                                  <p className="truncate text-sm font-semibold text-foreground">
-                                    {doc.title}
-                                  </p>
-                                  <span className="text-xs text-muted-foreground">
-                                    {formatBytes(doc.fileSize)}
-                                  </span>
-                                </div>
-                                <p className="mt-1 truncate text-xs text-muted-foreground">
-                                  {doc.description ||
-                                    `Đã tải lên: ${formatDate(doc.createdAt)}`}
-                                </p>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Card>
-              )
-            })}
-          </Accordion>
-        )}
-
-        <Button
-          variant="outline"
-          className="h-11 gap-2 rounded-full px-5 text-base"
-          onClick={() => setDialogOpen(true)}
-        >
-          <Plus className="size-5" />
-          Thêm
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            Thư viện môn học
+          </h1>
+          <p className="mt-1 text-muted-foreground">
+            Sắp xếp tài liệu học tập theo từng course để truy cập nhanh hơn.
+          </p>
+        </div>
+        <Button className="gap-2" onClick={() => setDialogOpen(true)}>
+          <Plus className="size-4" />
+          Thêm course
         </Button>
-      </section>
+      </div>
+
+      {isError && (
+        <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-center text-sm text-destructive">
+          Không thể tải thư viện. Vui lòng thử lại.
+        </div>
+      )}
+
+      {isLoading && (
+        <div className="space-y-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Card key={index}>
+              <CardContent className="flex items-center gap-4 p-5">
+                <Skeleton className="size-11 rounded-md" />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <Skeleton className="h-5 w-52" />
+                  <Skeleton className="h-4 w-36" />
+                </div>
+                <Skeleton className="size-8 rounded-md" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {!isLoading && !isError && courses.length === 0 && (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-16 text-center text-muted-foreground">
+          <BookOpen className="size-10 opacity-40" />
+          <p className="text-sm">Chưa có course nào.</p>
+          <Button variant="outline" size="sm" onClick={() => setDialogOpen(true)}>
+            Tạo course đầu tiên
+          </Button>
+        </div>
+      )}
+
+      {!isLoading && !isError && courses.length > 0 && (
+        <Accordion type="multiple" className="gap-4">
+          {courses.map((course) => {
+            const documents = documentsByCourse.get(course.id) ?? []
+            return (
+              <Card
+                key={course.id}
+                className="overflow-hidden transition-shadow hover:shadow-md"
+              >
+                <AccordionItem value={course.id} className="border-b-0">
+                  <AccordionTrigger className="px-5 py-4 hover:no-underline">
+                    <div className="flex min-w-0 flex-1 items-start gap-4 pr-4">
+                      <div className="flex size-11 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                        <FolderOpen className="size-5" />
+                      </div>
+                      <div className="min-w-0 space-y-1 text-left">
+                        <h3 className="truncate text-base font-semibold text-foreground">
+                          {course.name}
+                        </h3>
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                          <Badge variant="secondary">
+                            {documents.length} tài liệu
+                          </Badge>
+                          {course.description && (
+                            <span className="truncate">
+                              {course.description}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      className="mr-4 shrink-0 text-muted-foreground hover:text-destructive"
+                      disabled={deleteCourse.isPending}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        requestDeleteCourse(course)
+                      }}
+                      aria-label="Xóa course"
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </AccordionTrigger>
+
+                  <AccordionContent className="px-5 pb-5">
+                    <div className="space-y-3 border-t pt-4">
+                      {documents.length === 0 ? (
+                        <div className="rounded-xl border border-dashed py-10 text-center text-sm text-muted-foreground">
+                          Course này chưa có tài liệu.
+                        </div>
+                      ) : (
+                        documents.map((doc) => (
+                          <div
+                            key={doc.id}
+                            role="button"
+                            tabIndex={0}
+                            className="flex cursor-pointer items-center gap-3 rounded-lg border bg-background p-3 outline-none transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring"
+                            onClick={() => navigate(`/documents/${doc.id}`)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault()
+                                navigate(`/documents/${doc.id}`)
+                              }
+                            }}
+                          >
+                            <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                              <FileText className="size-4" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                                <p className="truncate text-sm font-medium text-foreground">
+                                  {doc.title}
+                                </p>
+                                <span className="text-xs text-muted-foreground">
+                                  {formatBytes(doc.fileSize)}
+                                </span>
+                              </div>
+                              <p className="mt-1 truncate text-xs text-muted-foreground">
+                                {doc.description ||
+                                  `Đã tải lên: ${formatDate(doc.createdAt)}`}
+                              </p>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Card>
+            )
+          })}
+        </Accordion>
+      )}
 
       <Dialog
         open={dialogOpen}
