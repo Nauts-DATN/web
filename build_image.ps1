@@ -1,0 +1,1 @@
+docker build -t nauts-web:latest --build-arg VITE_API_URL=http://localhost:4000 -f Dockerfile .
