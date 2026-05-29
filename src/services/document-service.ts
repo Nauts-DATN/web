@@ -1,5 +1,5 @@
 import API_ROUTES from "@/conf/constants/api-routes"
-import type { DocumentListRes, DocumentRes, SetVisibilityRes } from "@/types/db/document"
+import type { DocumentListRes, DocumentRes } from "@/types/db/document"
 import type { ApiResponse } from "@/types/core/api"
 import api from "@/utils/api"
 
@@ -9,7 +9,6 @@ export type UploadDocumentPayload = {
   description?: string
   category?: string
   course?: string
-  isPublic?: boolean
 }
 
 export type DocumentListFilters = {
@@ -34,13 +33,6 @@ const documentService = {
     return res.data
   },
 
-  listCommunity: async (filters?: DocumentListFilters): Promise<DocumentListRes> => {
-    const res = await api.get(API_ROUTES.DOCUMENTS.COMMUNITY, {
-      params: toParams(filters),
-    })
-    return res.data
-  },
-
   upload: async (payload: UploadDocumentPayload): Promise<DocumentRes> => {
     const form = new FormData()
     form.append("file", payload.file)
@@ -48,10 +40,6 @@ const documentService = {
     if (payload.description) form.append("description", payload.description)
     if (payload.category) form.append("category", payload.category)
     if (payload.course) form.append("course", payload.course)
-    if (payload.isPublic !== undefined) {
-      form.append("isPublic", String(payload.isPublic))
-    }
-
     const res = await api.post(API_ROUTES.DOCUMENTS.BASE, form, {
       headers: { "Content-Type": "multipart/form-data" },
     })
@@ -68,10 +56,6 @@ const documentService = {
     return res.data
   },
 
-  setVisibility: async (id: string, isPublic: boolean): Promise<SetVisibilityRes> => {
-    const res = await api.patch(API_ROUTES.DOCUMENTS.VISIBILITY(id), { isPublic })
-    return res.data
-  },
 }
 
 export default documentService
