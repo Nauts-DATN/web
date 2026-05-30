@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,6 +8,7 @@ import { toast } from "sonner"
 
 export function Register() {
   const { register } = useAuth()
+  const navigate = useNavigate()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -22,6 +23,9 @@ export function Register() {
         ? "Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản."
         : "Đăng ký thất bại. Vui lòng thử lại."
       toast.success(msg)
+      if (res.isSuccess) {
+        navigate("/verify-email", { state: { email } })
+      }
     } catch (e) {
       const msg =
         e instanceof Error ? e.message : "Đăng ký thất bại. Vui lòng thử lại."

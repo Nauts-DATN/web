@@ -10,6 +10,7 @@ import { MainLayout } from "@/layouts/MainLayout"
 import { AdminLayout } from "@/layouts/AdminLayout"
 import { Login } from "@/pages/Login"
 import { Register } from "@/pages/Register"
+import { VerifyEmail } from "@/pages/VerifyEmail"
 import { Dashboard } from "@/pages/Dashboard"
 import { Documents } from "@/pages/Documents"
 import { DocumentDetail } from "@/pages/DocumentDetail"
@@ -36,6 +37,7 @@ export default function App() {
             <Route element={<AuthLayout />}>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
             </Route>
 
             <Route element={<MainLayout />}>

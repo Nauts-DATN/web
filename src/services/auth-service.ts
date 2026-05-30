@@ -16,7 +16,9 @@ const authService = {
         return response.data;
     },
     verifyEmail: async (data: VerifyEmailReq): Promise<AuthRes> => {
-        const response = await api.post(API_ROUTES.AUTH.VERIFY_EMAIL, data);
+        const response = await api.get(API_ROUTES.AUTH.VERIFY_EMAIL, {
+            params: { token: data.token },
+        });
         return response.data;
     },
     verifyEmailCode: async (data: VerifyEmailCodeReq): Promise<AuthRes> => {

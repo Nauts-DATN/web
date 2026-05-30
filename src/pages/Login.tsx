@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,6 +8,9 @@ import { toast } from "sonner"
 
 export function Login() {
   const { login } = useAuth()
+  const location = useLocation()
+  const message =
+    (location.state as { message?: string } | null)?.message ?? null
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -29,6 +32,11 @@ export function Login() {
 
   return (
     <form className="space-y-5" onSubmit={handleSubmit}>
+      {message && (
+        <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+          {message}
+        </div>
+      )}
       <Field>
         <FieldLabel htmlFor="login-email">Email</FieldLabel>
         <Input
