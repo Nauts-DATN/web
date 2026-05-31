@@ -369,7 +369,7 @@ export function DocumentDetail() {
                     AI đọc toàn bộ nội dung PDF và tạo bản tóm tắt có cấu trúc.
                   </p>
                   <Button
-                    className="w-full gap-2 bg-violet-600 text-white hover:bg-violet-700"
+                    className="w-full gap-2"
                     onClick={handleSummarize}
                     disabled={summarizeMutation.isPending}
                   >
@@ -434,7 +434,7 @@ export function DocumentDetail() {
               </Field>
 
               <Button
-                className="w-full gap-2 bg-indigo-600 text-white hover:bg-indigo-700"
+                className="w-full gap-2"
                 onClick={handleGenerateQuiz}
                 disabled={generateQuizMutation.isPending}
               >

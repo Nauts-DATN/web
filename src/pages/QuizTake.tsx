@@ -341,7 +341,6 @@ export function QuizTake() {
         {currentQuestion === quizData.questions.length - 1 ? (
           <Button
             onClick={handleSubmit}
-            className="bg-emerald-600 text-white hover:bg-emerald-700"
           >
             Nộp bài
           </Button>

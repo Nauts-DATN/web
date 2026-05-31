@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { isAxiosError } from "axios"
 import {
   Camera,
@@ -50,7 +50,8 @@ function resolveAvatarSrc(user?: Partial<AppUser> | null) {
   ) {
     return user.avatar
   }
-  return user.id ? API_ROUTES.USERS.AVATAR(user.id) : ""
+  const version = encodeURIComponent(user.avatar)
+  return user.id ? `${API_ROUTES.USERS.AVATAR(user.id)}?v=${version}` : ""
 }
 
 function getInitials(name?: string) {
@@ -75,6 +76,10 @@ export function AdminDashboard() {
   const updateName = useUpdateUserName()
   const updateAvatar = useUpdateUserAvatar()
   const updatePassword = useUpdateUserPassword()
+
+  useEffect(() => {
+    setAvatarUrl(resolveAvatarSrc(user))
+  }, [user?.id, user?.avatar])
 
   const users = data?.isSuccess ? (data.data ?? []) : []
   const totalUsers = users.length
@@ -122,7 +127,9 @@ export function AdminDashboard() {
       if (res.isSuccess && res.data) {
         const nextAvatar = `${res.data.publicUrl}?t=${Date.now()}`
         setAvatarUrl(nextAvatar)
-        updateUser({ ...res.data.user, avatar: nextAvatar })
+        if (res.data.user) {
+          updateUser(res.data.user)
+        }
         toast.success("Đã cập nhật avatar")
       }
     } catch (error) {

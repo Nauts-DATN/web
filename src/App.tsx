@@ -17,7 +17,6 @@ import { DocumentDetail } from "@/pages/DocumentDetail"
 import { Notes } from "@/pages/Notes"
 import { QuizList } from "@/pages/QuizList"
 import { QuizTake } from "@/pages/QuizTake"
-import { Progress } from "@/pages/Progress"
 import { Profile } from "@/pages/Profile"
 import { Roadmaps } from "@/pages/Roadmaps"
 import { RoadmapDetail } from "@/pages/RoadmapDetail"
@@ -51,7 +50,6 @@ export default function App() {
               <Route path="/quiz/:id" element={<QuizTake />} />
               <Route path="/roadmaps" element={<Roadmaps />} />
               <Route path="/roadmaps/:id" element={<RoadmapDetail />} />
-              {/* <Route path="/progress" element={<Progress />} /> */}
               <Route path="/profile" element={<Profile />} />
             </Route>
 

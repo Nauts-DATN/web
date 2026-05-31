@@ -129,7 +129,7 @@ export function Library() {
     const documentCount = documentsByCourse.get(course.id)?.length ?? 0
     if (documentCount > 0) {
       toast.error(
-        `Không thể xóa course này vì đang có ${documentCount} tài liệu.`,
+        `Không thể xóa vì đang có ${documentCount} tài liệu trong môn này.`,
       )
       return
     }
@@ -160,12 +160,12 @@ export function Library() {
             Thư viện môn học
           </h1>
           <p className="mt-1 text-muted-foreground">
-            Sắp xếp tài liệu học tập theo từng course để truy cập nhanh hơn.
+            Sắp xếp tài liệu học tập theo từng môn học/khóa học để truy cập nhanh hơn.
           </p>
         </div>
         <Button className="gap-2" onClick={() => setDialogOpen(true)}>
           <Plus className="size-4" />
-          Thêm course
+          Thêm môn học
         </Button>
       </div>
 
@@ -309,11 +309,11 @@ export function Library() {
         <DialogContent className="sm:max-w-md">
           <form onSubmit={handleCreateCourse} className="space-y-4">
             <DialogHeader>
-              <DialogTitle>Thêm course</DialogTitle>
+              <DialogTitle>Thêm môn học</DialogTitle>
             </DialogHeader>
 
             <div className="space-y-1.5">
-              <Label htmlFor="course-name">Tên course</Label>
+              <Label htmlFor="course-name">Tên môn học</Label>
               <Input
                 id="course-name"
                 value={name}

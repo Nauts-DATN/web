@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { isAxiosError } from "axios"
 import { useAuth } from "@/context/AuthContext"
 import {
@@ -43,7 +43,8 @@ function resolveAvatarSrc(user?: Partial<User> | null) {
   ) {
     return user.avatar
   }
-  return user.id ? API_ROUTES.USERS.AVATAR(user.id) : ""
+  const version = encodeURIComponent(user.avatar)
+  return user.id ? `${API_ROUTES.USERS.AVATAR(user.id)}?v=${version}` : ""
 }
 
 
@@ -58,6 +59,10 @@ export function Profile() {
   const [avatarUrl, setAvatarUrl] = useState(
       resolveAvatarSrc(user),
   )
+
+  useEffect(() => {
+    setAvatarUrl(resolveAvatarSrc(user))
+  }, [user?.id, user?.avatar])
 
   const updateNameMutation = useUpdateUserName()
   const updateAvatarMutation = useUpdateUserAvatar()
@@ -101,10 +106,11 @@ export function Profile() {
       setAvatarUrl(previewUrl)
       const res = await updateAvatarMutation.mutateAsync(file)
       if (res.isSuccess && res.data) {
-        // const nextAvatar = `${res.data.publicUrl}?t=${Date.now()}`
-        const nextAvatar = res.data.publicUrl
+        const nextAvatar = `${res.data.publicUrl}?t=${Date.now()}`
         setAvatarUrl(nextAvatar || "")
-        updateUser({ ...res.data.user, avatar: nextAvatar })
+        if (res.data.user) {
+          updateUser(res.data.user)
+        }
         toast.success("Đã cập nhật ảnh đại diện")
       }
       URL.revokeObjectURL(previewUrl)

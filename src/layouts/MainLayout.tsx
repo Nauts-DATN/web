@@ -32,10 +32,9 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Tài liệu của tôi", href: "/documents", icon: FileText },
-  { name: "Ghi chú", href: "/notes", icon: PenTool },
-  { name: "Luyện tập", href: "/quiz", icon: CheckSquare },
   { name: "Roadmap", href: "/roadmaps", icon: BookOpenCheck },
-  // { name: "Tiến độ", href: "/progress", icon: TrendingUp },
+  { name: "Luyện tập", href: "/quiz", icon: CheckSquare },
+  { name: "Ghi chú", href: "/notes", icon: PenTool },
   { name: "Thư Viện", href: "/library", icon: FileText },
 ]
 

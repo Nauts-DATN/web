@@ -22,8 +22,8 @@ export function Login() {
       await login(email, password)
       toast.success("Đăng nhập thành công!")
     } catch (e) {
-      const msg =
-        e instanceof Error ? e.message : "Đăng nhập thất bại. Vui lòng thử lại."
+      const msg = "Email hoặc mật khẩu không đúng. Vui lòng thử lại."
+        // e instanceof Error ? e.message : "Đăng nhập thất bại. Vui lòng thử lại."
       toast.error(msg)
     } finally {
       setIsLoading(false)

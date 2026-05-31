@@ -40,13 +40,11 @@ function QuizCard({ quiz }: { quiz: Quiz }) {
     <Card className="flex flex-col transition-shadow hover:shadow-md">
       <CardContent className="flex flex-1 flex-col p-4">
         <div className="mb-4 flex items-start justify-between gap-2">
-          <div
-            className={`rounded-xl p-3 ${isMc ? "bg-indigo-500/10" : "bg-violet-500/10"}`}
-          >
+          <div className="flex size-12 items-center justify-center rounded-xl bg-muted">
             {isMc ? (
-              <CheckSquare className="size-6 text-indigo-600 dark:text-indigo-400" />
+              <CheckSquare className="size-6" />
             ) : (
-              <PenLine className="size-6 text-violet-600 dark:text-violet-400" />
+              <PenLine className="size-6" />
             )}
           </div>
           <Badge variant={isMc ? "secondary" : "outline"} className="shrink-0">
@@ -143,7 +141,7 @@ export function QuizList() {
 
       {/* Empty */}
       {!isLoading && !isError && quizzes.length === 0 && (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center">
+        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed py-20 text-center">
           <Sparkles className="mb-4 size-10 text-muted-foreground/40" />
           <p className="text-lg font-medium text-muted-foreground">
             Chưa có quiz nào

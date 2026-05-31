@@ -266,7 +266,7 @@ export function Notes() {
           ))}
 
         {!isLoading && groupedDocuments.length === 0 && (
-          <div className="rounded-xl border border-dashed py-16 text-center text-muted-foreground">
+          <div className="rounded-xl border-2 border-dashed py-16 text-center text-muted-foreground">
             {search
               ? "Không tìm thấy tài liệu có ghi chú phù hợp."
               : "Chưa có tài liệu nào có ghi chú."}

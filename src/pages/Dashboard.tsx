@@ -119,7 +119,7 @@ export function Dashboard() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          Chào mừng trở lại, {user?.name || "bạn"}
+          Chào mừng, {user?.name || "bạn"}
         </h1>
         <p className="mt-1 text-muted-foreground">
           Dưới đây là tổng quan dữ liệu học tập của bạn từ hệ thống.

@@ -84,7 +84,8 @@ function resolveAvatarSrc(user: User) {
   ) {
     return user.avatar
   }
-  return API_ROUTES.USERS.AVATAR(user.id)
+  const version = encodeURIComponent(user.avatar)
+  return `${API_ROUTES.USERS.AVATAR(user.id)}?v=${version}`
 }
 
 export function AdminUsers() {
