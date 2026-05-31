@@ -6,6 +6,7 @@ const API_ROUTES = {
   AUTH: {
     LOGIN: "/api/auth/login",
     REGISTER: "/api/auth/register",
+    REFRESH: "/api/auth/refresh",
     ME: "/api/auth/me",
     VERIFY_EMAIL: "/api/auth/verify-email",
     VERIFY_EMAIL_CODE: "/api/auth/verify-email-code",

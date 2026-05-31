@@ -1,5 +1,5 @@
 import API_ROUTES from "@/conf/constants/api-routes";
-import type { AuthRes, LoginReq, RegisterReq, LogoutRes, VerifyEmailReq, VerifyEmailCodeReq, ResendVerificationReq } from "@/types/core/auth";
+import type { AuthRes, LoginReq, RegisterReq, LogoutRes, VerifyEmailReq, VerifyEmailCodeReq, ResendVerificationReq, RefreshReq } from "@/types/core/auth";
 import api from "@/utils/api";
 
 const authService = {
@@ -11,8 +11,12 @@ const authService = {
         const response = await api.post(API_ROUTES.AUTH.REGISTER, data);
         return response.data;
     },
-    logout: async (): Promise<LogoutRes> => {
-        const response = await api.post(API_ROUTES.AUTH.LOGOUT);
+    logout: async (refreshToken?: string): Promise<LogoutRes> => {
+        const response = await api.post(API_ROUTES.AUTH.LOGOUT, { refreshToken });
+        return response.data;
+    },
+    refresh: async (data: RefreshReq): Promise<AuthRes> => {
+        const response = await api.post(API_ROUTES.AUTH.REFRESH, data);
         return response.data;
     },
     verifyEmail: async (data: VerifyEmailReq): Promise<AuthRes> => {

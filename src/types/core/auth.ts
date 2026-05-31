@@ -3,6 +3,7 @@ import type { ApiResponse } from "./api";
 
 export type AuthRes = ApiResponse<{
     accessToken?: string;
+    refreshToken?: string;
     /** @deprecated dùng accessToken */
     // token?: string;
     user: Partial<User>;
@@ -20,6 +21,9 @@ export type RegisterReq = {
 export type LogoutRes = ApiResponse<{
     message: string;
   }>;
+export type RefreshReq = {
+    refreshToken: string;
+  };
 export type VerifyEmailReq = {
     token: string;
   };

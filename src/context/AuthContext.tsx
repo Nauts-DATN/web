@@ -7,6 +7,7 @@ import React, {
 } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { useLogin, useRegister, authKeys } from "@/hooks/queries/auth-hooks"
+import authService from "@/services/auth-service"
 import Persistence from "@/utils/persistence"
 import type { AuthRes, AuthState } from "@/types/core/auth"
 import type { User } from "@/types/db/user"
@@ -14,17 +15,20 @@ import type { User } from "@/types/db/user"
 // ─── Persistence keys ─────────────────────────────────────────────────────────
 
 const AUTH_TOKEN_KEY = "auth_token"
+const AUTH_REFRESH_TOKEN_KEY = "auth_refresh_token"
 const AUTH_USER_KEY  = "auth_user"
 
 // ─── Persistence helpers ──────────────────────────────────────────────────────
 
 function saveAuthData(data: NonNullable<AuthRes["data"]>) {
   if (data.accessToken) Persistence.setItem(AUTH_TOKEN_KEY, data.accessToken)
+  if (data.refreshToken) Persistence.setItem(AUTH_REFRESH_TOKEN_KEY, data.refreshToken)
   if (data.user)        Persistence.setItem(AUTH_USER_KEY, data.user)
 }
 
 function clearAuthData() {
   Persistence.removeItem(AUTH_TOKEN_KEY)
+  Persistence.removeItem(AUTH_REFRESH_TOKEN_KEY)
   Persistence.removeItem(AUTH_USER_KEY)
 }
 
@@ -115,6 +119,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const logout = useCallback(() => {
+    const refreshToken = Persistence.getItem<string>(AUTH_REFRESH_TOKEN_KEY)
+    void authService.logout(refreshToken ?? undefined).catch(() => undefined)
     clearAuthData()
     queryClient.removeQueries({ queryKey: authKeys.root })
     setAuthState({
