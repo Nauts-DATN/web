@@ -64,6 +64,13 @@ function formatDate(iso: string): string {
   })
 }
 
+const ALLOWED_DOCUMENT_EXTENSIONS = [".pdf", ".doc", ".docx"]
+
+function isAllowedDocumentFile(file: File): boolean {
+  const name = file.name.toLowerCase()
+  return ALLOWED_DOCUMENT_EXTENSIONS.some((ext) => name.endsWith(ext))
+}
+
 // ─── Upload Dialog ────────────────────────────────────────────────────────────
 
 type UploadDialogProps = {
@@ -72,6 +79,7 @@ type UploadDialogProps = {
 }
 
 function UploadDialog({ open, onOpenChange }: UploadDialogProps) {
+  const navigate = useNavigate()
   const fileRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File | null>(null)
   const [title, setTitle] = useState("")
@@ -79,6 +87,7 @@ function UploadDialog({ open, onOpenChange }: UploadDialogProps) {
   const [categoryId, setCategoryId] = useState("")
   const [courseId, setCourseId] = useState("")
   const [dragOver, setDragOver] = useState(false)
+  const [fileError, setFileError] = useState("")
 
   const { data: catData } = useCategories()
   const { data: courseData } = useCourses()
@@ -94,6 +103,7 @@ function UploadDialog({ open, onOpenChange }: UploadDialogProps) {
     setCategoryId("")
     setCourseId("")
     setDragOver(false)
+    setFileError("")
   }
 
   function handleClose() {
@@ -102,6 +112,13 @@ function UploadDialog({ open, onOpenChange }: UploadDialogProps) {
   }
 
   function handleFile(f: File) {
+    if (!isAllowedDocumentFile(f)) {
+      setFile(null)
+      setFileError("Chỉ hỗ trợ file PDF, DOC hoặc DOCX.")
+      if (fileRef.current) fileRef.current.value = ""
+      return
+    }
+    setFileError("")
     setFile(f)
     if (!title) setTitle(f.name.replace(/\.[^.]+$/, ""))
   }
@@ -116,6 +133,10 @@ function UploadDialog({ open, onOpenChange }: UploadDialogProps) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!file || !title.trim()) return
+    if (!isAllowedDocumentFile(file)) {
+      setFileError("Chỉ hỗ trợ file PDF, DOC hoặc DOCX.")
+      return
+    }
 
     await uploadMutation.mutateAsync({
       file,
@@ -153,6 +174,7 @@ function UploadDialog({ open, onOpenChange }: UploadDialogProps) {
             <input
               ref={fileRef}
               type="file"
+              accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               className="hidden"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
             />
@@ -168,7 +190,12 @@ function UploadDialog({ open, onOpenChange }: UploadDialogProps) {
                 <button
                   type="button"
                   className="absolute right-2 top-2 rounded-full p-1 hover:bg-muted"
-                  onClick={(e) => { e.stopPropagation(); setFile(null) }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setFile(null)
+                    setFileError("")
+                    if (fileRef.current) fileRef.current.value = ""
+                  }}
                 >
                   <X className="size-4 text-muted-foreground" />
                 </button>
@@ -183,6 +210,9 @@ function UploadDialog({ open, onOpenChange }: UploadDialogProps) {
               </>
             )}
           </div>
+          {fileError && (
+            <p className="text-sm text-destructive">{fileError}</p>
+          )}
 
           {/* Title */}
           <div className="space-y-1.5">
@@ -229,6 +259,7 @@ function UploadDialog({ open, onOpenChange }: UploadDialogProps) {
 
             <div className="space-y-1.5">
               <Label>Môn học</Label>
+              {courses.length > 0 ? (
               <Select value={courseId} onValueChange={setCourseId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Chọn môn học" />
@@ -241,6 +272,24 @@ function UploadDialog({ open, onOpenChange }: UploadDialogProps) {
                   ))}
                 </SelectContent>
               </Select>
+              ) : (
+                <div className="flex min-h-10 items-center justify-between gap-2 rounded-md border border-dashed px-3 py-2">
+                  <span className="text-sm text-muted-foreground">
+                    Chưa có môn học nào
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      handleClose()
+                      navigate("/library")
+                    }}
+                  >
+                    Thêm môn học
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
 

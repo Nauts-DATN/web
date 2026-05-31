@@ -8,6 +8,12 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -323,7 +329,16 @@ export function DocumentDetail() {
             <CardContent className="space-y-4">
               {doc.summary ? (
                 <>
-                  <div className="rounded-lg border border-violet-500/20 bg-violet-500/5 p-3">
+                  <Accordion
+                    type="single"
+                    collapsible
+                    className="rounded-lg border border-violet-500/20 bg-violet-500/5 px-3"
+                  >
+                    <AccordionItem value="summary" className="border-0">
+                      <AccordionTrigger className="py-3 text-sm font-medium hover:no-underline">
+                        Nội dung tóm tắt
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-3">
                     <p className="whitespace-pre-wrap text-sm leading-relaxed">
                       {doc.summary}
                     </p>
@@ -332,7 +347,9 @@ export function DocumentDetail() {
                         Cập nhật: {formatDate(doc.summarizedAt)}
                       </p>
                     )}
-                  </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
                   <Button
                     variant="outline"
                     size="sm"
