@@ -11,6 +11,8 @@ const API_ROUTES = {
     VERIFY_EMAIL: "/api/auth/verify-email",
     VERIFY_EMAIL_CODE: "/api/auth/verify-email-code",
     RESEND_VERIFICATION: "/api/auth/resend-verification",
+    FORGOT_PASSWORD: "/api/auth/forgot-password",
+    RESET_PASSWORD: "/api/auth/reset-password",
     LOGOUT: "/api/auth/logout",
   },
   USERS: {

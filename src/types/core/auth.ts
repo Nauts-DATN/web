@@ -34,6 +34,14 @@ export type VerifyEmailCodeReq = {
 export type ResendVerificationReq = {
     email: string;
   };
+export type ForgotPasswordReq = {
+    email: string;
+  };
+export type ResetPasswordReq = {
+    email: string;
+    code: string;
+    newPassword: string;
+  };
 
 export type AuthState = {
     token: string | null;

@@ -1,10 +1,18 @@
-import { useState } from "react"
+﻿import { useState } from "react"
 import { Link, useLocation } from "react-router-dom"
+import { isAxiosError } from "axios"
 import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { toast } from "sonner"
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (isAxiosError(error)) {
+    return (error.response?.data as { error?: string })?.error ?? error.message
+  }
+  return error instanceof Error ? error.message : fallback
+}
 
 export function Login() {
   const { login } = useAuth()
@@ -22,9 +30,7 @@ export function Login() {
       await login(email, password)
       toast.success("Đăng nhập thành công!")
     } catch (e) {
-      const msg = "Email hoặc mật khẩu không đúng. Vui lòng thử lại."
-        // e instanceof Error ? e.message : "Đăng nhập thất bại. Vui lòng thử lại."
-      toast.error(msg)
+      toast.error(getErrorMessage(e, "Login failed. Please try again."))
     } finally {
       setIsLoading(false)
     }

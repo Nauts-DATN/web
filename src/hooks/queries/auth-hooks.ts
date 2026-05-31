@@ -6,7 +6,10 @@ import type {
     VerifyEmailReq,
     VerifyEmailCodeReq,
     ResendVerificationReq,
+    ForgotPasswordReq,
+    ResetPasswordReq,
     AuthRes,
+    LogoutRes,
 } from "@/types/core/auth"
 
 export const authKeys = {
@@ -34,6 +37,16 @@ export const useVerifyEmailCode = () =>
 export const useResendVerification = () =>
     useMutation<AuthRes, Error, ResendVerificationReq>({
         mutationFn: authService.resendVerification,
+    })
+
+export const useForgotPassword = () =>
+    useMutation<LogoutRes, Error, ForgotPasswordReq>({
+        mutationFn: authService.forgotPassword,
+    })
+
+export const useResetPassword = () =>
+    useMutation<LogoutRes, Error, ResetPasswordReq>({
+        mutationFn: authService.resetPassword,
     })
 
 /** GET /auth/verify-email?token=… (link email xác thực) */

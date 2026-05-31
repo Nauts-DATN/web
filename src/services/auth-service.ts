@@ -1,5 +1,5 @@
 import API_ROUTES from "@/conf/constants/api-routes";
-import type { AuthRes, LoginReq, RegisterReq, LogoutRes, VerifyEmailReq, VerifyEmailCodeReq, ResendVerificationReq, RefreshReq } from "@/types/core/auth";
+import type { AuthRes, LoginReq, RegisterReq, LogoutRes, VerifyEmailReq, VerifyEmailCodeReq, ResendVerificationReq, RefreshReq, ForgotPasswordReq, ResetPasswordReq } from "@/types/core/auth";
 import api from "@/utils/api";
 
 const authService = {
@@ -31,6 +31,14 @@ const authService = {
     },
     resendVerification: async (data: ResendVerificationReq): Promise<AuthRes> => {
         const response = await api.post(API_ROUTES.AUTH.RESEND_VERIFICATION, data);
+        return response.data;
+    },
+    forgotPassword: async (data: ForgotPasswordReq): Promise<LogoutRes> => {
+        const response = await api.post(API_ROUTES.AUTH.FORGOT_PASSWORD, data);
+        return response.data;
+    },
+    resetPassword: async (data: ResetPasswordReq): Promise<LogoutRes> => {
+        const response = await api.post(API_ROUTES.AUTH.RESET_PASSWORD, data);
         return response.data;
     },
 }
