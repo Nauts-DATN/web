@@ -71,7 +71,14 @@ export function Login() {
       <Button type="submit" className="w-full" isLoading={isLoading}>
         Đăng nhập
       </Button>
-
+      <p className="text-center text-sm text-muted-foreground">
+        <Link
+          to="/forgot-password"
+          className="font-medium text-primary underline-offset-4 hover:underline"
+        >
+          Quên mật khẩu?
+        </Link>
+      </p>
       <p className="text-center text-sm text-muted-foreground">
         Chưa có tài khoản?{" "}
         <Link
