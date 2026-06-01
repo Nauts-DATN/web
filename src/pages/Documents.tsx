@@ -425,7 +425,7 @@ export function Documents() {
 
       {/* Grid */}
       {!isLoading && documents.length > 0 && (
-        <div className="grid grid-cols-1 gap-2.5">
+        <div className="grid grid-cols-2 gap-2.5">
           {documents.map((doc) => (
             <Card key={doc.id} className="transition-shadow hover:shadow-md">
               <CardContent className="p-3">

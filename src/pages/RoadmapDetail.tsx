@@ -399,7 +399,7 @@ export function RoadmapDetail() {
                 id="task-title"
                 value={taskTitle}
                 onChange={(e) => setTaskTitle(e.target.value)}
-                placeholder="Ví dụ: Learn JSX"
+                placeholder="Tiêu đề task"
               />
             </div>
 
