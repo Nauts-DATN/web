@@ -261,7 +261,7 @@ export function Roadmaps() {
                 id="roadmap-title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Ví dụ: Learn React in 14 days"
+                placeholder="Ví dụ: Học toán cao cấp"
               />
             </div>
 

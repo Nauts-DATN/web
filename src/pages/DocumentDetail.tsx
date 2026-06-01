@@ -1,6 +1,9 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
+import { Document as PdfDocument, Page, pdfjs } from "react-pdf"
+import "react-pdf/dist/Page/AnnotationLayer.css"
+import "react-pdf/dist/Page/TextLayer.css"
 import {
   Card,
   CardContent,
@@ -46,6 +49,8 @@ import {
   Edit2,
 } from "lucide-react"
 import { toast } from "sonner"
+import API_ROUTES from "@/conf/constants/api-routes"
+import api from "@/utils/api"
 import { useDocument } from "@/hooks/queries/document-hooks"
 import {
   useSummarizeDocument,
@@ -61,6 +66,12 @@ import {
 } from "@/hooks/queries/note-hooks"
 import type { Note } from "@/types/db/note"
 import { isAxiosError } from "axios"
+
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "react-pdf/node_modules/pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url
+).toString()
+
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
@@ -78,6 +89,124 @@ function formatDate(iso: string): string {
   })
 }
 
+function PdfPreview({ documentId }: { documentId: string }) {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const [fileUrl, setFileUrl] = useState("")
+  const [numPages, setNumPages] = useState(0)
+  const [pageWidth, setPageWidth] = useState(800)
+  const [loadError, setLoadError] = useState("")
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const updatePageWidth = () => {
+      setPageWidth(Math.max(280, Math.min(container.clientWidth - 32, 800)))
+    }
+
+    updatePageWidth()
+
+    const resizeObserver = new ResizeObserver(updatePageWidth)
+    resizeObserver.observe(container)
+
+    return () => {
+      resizeObserver.disconnect()
+    }
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    let objectUrl = ""
+
+    async function loadPdf() {
+      setFileUrl("")
+      setNumPages(0)
+      setLoadError("")
+
+      try {
+        const response = await api.get(API_ROUTES.DOCUMENTS.DOWNLOAD(documentId), {
+          responseType: "blob",
+        })
+
+        if (cancelled) return
+
+        const blob =
+          response.data instanceof Blob
+            ? response.data
+            : new Blob([response.data], { type: "application/pdf" })
+
+        objectUrl = URL.createObjectURL(blob)
+        setFileUrl(objectUrl)
+      } catch (error) {
+        if (cancelled) return
+
+        const message = isAxiosError(error)
+          ? (error.response?.data as { error?: string })?.error ?? error.message
+          : "Khong the tai PDF."
+
+        setLoadError(message)
+      }
+    }
+
+    loadPdf()
+
+    return () => {
+      cancelled = true
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl)
+      }
+    }
+  }, [documentId])
+
+  if (loadError) {
+    return (
+      <div className="rounded-b-xl border-t bg-muted/30 p-6 text-sm text-destructive">
+        Không thể tải PDF. {loadError}
+      </div>
+    )
+  }
+
+  if (!fileUrl) {
+    return (
+      <div className="rounded-b-xl border-t bg-muted/30 p-6">
+        <Skeleton className="h-[480px] w-full" />
+      </div>
+    )
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className="h-[100vh] max-h-[900px] min-h-[520px] w-full overflow-y-auto overflow-x-hidden rounded-b-xl bg-muted/30 p-4"
+    >
+      <PdfDocument
+        file={fileUrl}
+        loading={<Skeleton className="h-[480px] w-full" />}
+        error={
+          <p className="p-6 text-sm text-destructive">
+            Không thể hiển thị PDF.
+          </p>
+        }
+        onLoadError={(error) => {
+          setLoadError(error.message || "Khong the hien thi PDF.")
+        }}
+        onLoadSuccess={({ numPages }) => {
+          setNumPages(numPages)
+        }}
+      >
+        <div className="flex flex-col items-center gap-4">
+          {Array.from({ length: numPages }, (_, index) => (
+            <Page
+              key={`page-${index + 1}`}
+              pageNumber={index + 1}
+              width={pageWidth}
+            />
+          ))}
+        </div>
+      </PdfDocument>
+    </div>
+  )
+}
 export function DocumentDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -295,11 +424,7 @@ export function DocumentDetail() {
           </CardHeader>
           <CardContent className="min-h-0 flex-1 p-0">
             {isPdf ? (
-              <iframe
-                title={doc.title}
-                src={doc.presignedUrl || doc.downloadUrl}
-                className="h-full w-full rounded-b-xl border-0 bg-muted/30"
-              />
+              <PdfPreview documentId={doc.id} />
             ) : (
               <div className="space-y-4 p-6">
                 <p className="text-sm text-muted-foreground">
