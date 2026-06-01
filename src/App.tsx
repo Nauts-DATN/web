@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { AuthProvider } from "@/context/AuthContext"
 import { AuthLayout } from "@/layouts/AuthLayout"
 import { MainLayout } from "@/layouts/MainLayout"
@@ -12,6 +12,7 @@ import { Login } from "@/pages/Login"
 import { Register } from "@/pages/Register"
 import { VerifyEmail } from "@/pages/VerifyEmail"
 import { ForgotPassword } from "@/pages/ForgotPassword"
+import { Home } from "@/pages/Home"
 import { Dashboard } from "@/pages/Dashboard"
 import { Documents } from "@/pages/Documents"
 import { DocumentDetail } from "@/pages/DocumentDetail"
@@ -41,8 +42,11 @@ export default function App() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
             </Route>
 
+            <Route>
+              <Route path="/" element={<Home />} />
+            </Route>
+
             <Route element={<MainLayout />}>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/documents" element={<Documents />} />
               <Route path="/documents/:id" element={<DocumentDetail />} />
