@@ -1,0 +1,51 @@
+import type { User } from "../db/user";
+import type { ApiResponse } from "./api";
+
+export type AuthRes = ApiResponse<{
+    accessToken?: string;
+    refreshToken?: string;
+    /** @deprecated dùng accessToken */
+    // token?: string;
+    user: Partial<User>;
+    emailVerificationRequired?: boolean;
+  }>;
+export type LoginReq = {
+    email: string;
+    password: string;
+  };
+export type RegisterReq = {
+    name: string;
+    email: string;
+    password: string;
+  };
+export type LogoutRes = ApiResponse<{
+    message: string;
+  }>;
+export type RefreshReq = {
+    refreshToken: string;
+  };
+export type VerifyEmailReq = {
+    token: string;
+  };
+export type VerifyEmailCodeReq = {
+    email: string;
+    code: string;
+  };
+export type ResendVerificationReq = {
+    email: string;
+  };
+export type ForgotPasswordReq = {
+    email: string;
+  };
+export type ResetPasswordReq = {
+    email: string;
+    code: string;
+    newPassword: string;
+  };
+
+export type AuthState = {
+    token: string | null;
+    user: Partial<User> | null;
+    isAuthenticated: boolean;
+    requiresEmailVerification: boolean;
+  };

@@ -1,67 +1,92 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { toast } from 'sonner';
+import { useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { useAuth } from "@/context/AuthContext"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Field, FieldLabel } from "@/components/ui/field"
+import { toast } from "sonner"
 
 export function Register() {
-  const { register } = useAuth();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const { register } = useAuth()
+  const navigate = useNavigate()
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+    e.preventDefault()
+    setIsLoading(true)
     try {
-      await register(name, email, password);
-      toast.success('Đăng ký thành công!');
-    } catch (error) {
-      toast.error('Đăng ký thất bại. Vui lòng thử lại.');
+      const res = await register(name, email, password)
+      const msg = res.isSuccess
+        ? "Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản."
+        : "Đăng ký thất bại. Vui lòng thử lại."
+      toast.success(msg)
+      if (res.isSuccess) {
+        navigate("/verify-email", { state: { email } })
+      }
+    } catch (e) {
+      const msg =
+        e instanceof Error ? e.message : "Đăng ký thất bại. Vui lòng thử lại."
+      toast.error(msg)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit}>
-      <Input
-        label="Họ và tên"
-        type="text"
-        required
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Nguyễn Văn A"
-      />
-      <Input
-        label="Email"
-        type="email"
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="you@example.com"
-      />
-      <Input
-        label="Mật khẩu"
-        type="password"
-        required
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="••••••••"
-      />
-      
+    <form className="space-y-5" onSubmit={handleSubmit}>
+      <Field>
+        <FieldLabel htmlFor="register-name">Họ và tên</FieldLabel>
+        <Input
+          id="register-name"
+          type="text"
+          required
+          autoComplete="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Nguyễn Văn A"
+        />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="register-email">Email</FieldLabel>
+        <Input
+          id="register-email"
+          type="email"
+          required
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+        />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="register-password">Mật khẩu</FieldLabel>
+        <Input
+          id="register-password"
+          type="password"
+          required
+          autoComplete="new-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+        />
+      </Field>
+
       <Button type="submit" className="w-full" isLoading={isLoading}>
         Đăng ký
       </Button>
 
-      <div className="text-sm text-center">
-        <span className="text-gray-500">Đã có tài khoản? </span>
-        <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
+      <p className="text-center text-sm text-muted-foreground">
+        Đã có tài khoản?{" "}
+        <Link
+          to="/login"
+          className="font-medium text-primary underline-offset-4 hover:underline"
+        >
           Đăng nhập
         </Link>
-      </div>
+      </p>
     </form>
-  );
+  )
 }

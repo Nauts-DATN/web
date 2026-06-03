@@ -1,20 +1,63 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Web
 
-# Run and deploy your AI Studio app
+Frontend for the system, built with React, TypeScript, Vite, and Tailwind CSS.
 
-This contains everything you need to run your app locally.
+## Requirements
 
-View your app in AI Studio: https://ai.studio/apps/74499fb7-606e-4835-bfef-57715e16c54b
+- Node.js 22+
+- npm
+- Backend running at `http://127.0.0.1:4000` for local development
+
+## Installation
+
+```bash
+npm install
+```
+
+## Environment Variables
+
+Create a `.env` file from `.env.example`:
+
+```bash
+cp .env.example .env
+```
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
+```bash
+npm run dev
+```
 
+The app runs at:
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+```text
+http://localhost:3000
+```
+
+## Type Check
+
+```bash
+npm run lint
+```
+
+## Production Build
+
+```bash
+npm run build
+```
+
+The production build is generated in the `dist/` directory.
+
+## Docker
+
+Build image:
+
+```bash
+docker build -t nauts-web:latest --build-arg VITE_API_URL=http://localhost:4000 -f Dockerfile .
+```
+
+Or run the PowerShell script:
+
+```powershell
+.\build_image.ps1
+```

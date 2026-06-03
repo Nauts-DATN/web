@@ -1,175 +1,165 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Card, CardContent } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { CheckSquare, Clock, Award, Sparkles, X } from 'lucide-react';
-import { toast } from 'sonner';
-import { GoogleGenAI, Type } from '@google/genai';
+import { useNavigate } from "react-router-dom"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { CheckSquare, PenLine, FileText, Sparkles, AlertCircle } from "lucide-react"
+import { useQuizzes } from "@/hooks/queries/ai-hooks"
+import type { Quiz } from "@/types/db/quiz"
 
-const MOCK_QUIZZES = [
-  { id: '1', title: 'Kiểm tra kiến thức ReactJS', subject: 'Lập trình Web', questions: 15, time: 20, score: null },
-  { id: '2', title: 'Ôn tập Cấu trúc dữ liệu', subject: 'Cấu trúc dữ liệu', questions: 20, time: 30, score: 85 },
-  { id: '3', title: 'Khái niệm cơ bản về AI', subject: 'Trí tuệ nhân tạo', questions: 10, time: 15, score: null },
-];
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+}
 
-export function QuizList() {
-  const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [topic, setTopic] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
+function QuizCard({ quiz }: { quiz: Quiz }) {
+  const navigate = useNavigate()
 
-  const handleGenerateAIQuiz = async () => {
-    if (!topic.trim()) {
-      toast.error('Vui lòng nhập chủ đề!');
-      return;
-    }
+  const isMc = quiz.questionType === "multiple_choice"
 
-    setIsGenerating(true);
-    try {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) throw new Error('Missing Gemini API Key');
-      
-      const ai = new GoogleGenAI({ apiKey });
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: `Tạo một bài trắc nghiệm gồm 5 câu hỏi về chủ đề: "${topic}".`,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                id: { type: Type.STRING, description: "ID duy nhất cho câu hỏi, ví dụ: q1, q2" },
-                text: { type: Type.STRING, description: "Nội dung câu hỏi" },
-                options: { 
-                  type: Type.ARRAY, 
-                  items: { type: Type.STRING },
-                  description: "Danh sách 4 lựa chọn đáp án"
-                },
-                answer: { type: Type.INTEGER, description: "Vị trí của đáp án đúng trong mảng options (từ 0 đến 3)" }
-              },
-              required: ["id", "text", "options", "answer"]
-            }
-          }
-        }
-      });
-      
-      const questions = JSON.parse(response.text || '[]');
-      if (!questions || questions.length === 0) throw new Error('No questions generated');
-
-      toast.success('Tạo quiz thành công!');
-      setIsModalOpen(false);
-      setTopic('');
-      navigate('/quiz/custom', {
-        state: {
-          quiz: {
-            id: 'custom',
-            title: `Quiz: ${topic}`,
-            questions: questions
-          }
-        }
-      });
-    } catch (error) {
-      console.error(error);
-      toast.error('Lỗi khi tạo quiz bằng AI.');
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+  const handleStart = () => {
+    navigate(`/quiz/${quiz.id}`, {
+      state: {
+        quiz: {
+          id: quiz.id,
+          title: quiz.documentTitle ? `Quiz: ${quiz.documentTitle}` : "Quiz",
+          questionType: quiz.questionType,
+          questions: quiz.questions,
+        },
+      },
+    })
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Bài luyện tập (Quiz)</h1>
-          <p className="text-gray-500 mt-1">Kiểm tra kiến thức của bạn qua các bài trắc nghiệm.</p>
+    <Card className="flex flex-col transition-shadow hover:shadow-md">
+      <CardContent className="flex flex-1 flex-col p-4">
+        <div className="mb-4 flex items-start justify-between gap-2">
+          <div className="flex size-12 items-center justify-center rounded-xl bg-muted">
+            {isMc ? (
+              <CheckSquare className="size-6" />
+            ) : (
+              <PenLine className="size-6" />
+            )}
+          </div>
+          <Badge variant={isMc ? "secondary" : "outline"} className="shrink-0">
+            {isMc ? "Trắc nghiệm" : "Tự luận"}
+          </Badge>
         </div>
-        <Button 
-          className="flex items-center bg-purple-600 hover:bg-purple-700 focus:ring-purple-500"
-          onClick={() => setIsModalOpen(true)}
-        >
-          <Sparkles className="w-4 h-4 mr-2" />
-          Tạo Quiz bằng AI
-        </Button>
+
+        {quiz.documentTitle ? (
+          <h3 className="mb-1 line-clamp-2 text-base font-semibold text-foreground">
+            Tên tài liệu: {quiz.documentTitle}
+          </h3>
+        ) : (
+          <h3 className="mb-1 text-base font-semibold text-muted-foreground italic">
+            Tài liệu không rõ
+          </h3>
+        )}
+
+        <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted-foreground">
+          <span className="inline-flex items-center gap-1">
+            <CheckSquare className="size-3.5" />
+            {quiz.questions.length} câu
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <FileText className="size-3.5" />
+            {formatDate(quiz.createdAt)}
+          </span>
+        </div>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <Button className="w-full" onClick={handleStart}>
+            Bắt đầu làm bài
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function QuizCardSkeleton() {
+  return (
+    <Card>
+      <CardContent className="p-6 space-y-4">
+        <div className="flex items-start justify-between">
+          <Skeleton className="size-12 rounded-xl" />
+          <Skeleton className="h-6 w-20 rounded-full" />
+        </div>
+        <Skeleton className="h-5 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
+        <Skeleton className="h-9 w-full" />
+      </CardContent>
+    </Card>
+  )
+}
+
+export function QuizList() {
+  const { data: res, isLoading, isError, refetch } = useQuizzes()
+  const quizzes = res?.isSuccess ? (res.data?.quizzes ?? []) : []
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            Bài luyện tập (Quiz)
+          </h1>
+          <p className="mt-1 text-muted-foreground">
+            Các bộ câu hỏi AI đã tạo từ tài liệu của bạn.
+          </p>
+        </div>
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
-            <div className="flex justify-between items-center p-4 border-b border-gray-100">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                <Sparkles className="w-5 h-5 mr-2 text-purple-600" />
-                Tạo Quiz bằng AI
-              </h3>
-              <button 
-                onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600 p-1 rounded-md"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="p-6 space-y-4">
-              <p className="text-sm text-gray-500">
-                Nhập chủ đề bạn muốn kiểm tra kiến thức, AI sẽ tự động tạo một bài trắc nghiệm gồm 5 câu hỏi cho bạn.
-              </p>
-              <Input
-                label="Chủ đề"
-                placeholder="VD: Lịch sử Việt Nam, JavaScript cơ bản..."
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                autoFocus
-              />
-              <Button 
-                className="w-full bg-purple-600 hover:bg-purple-700 focus:ring-purple-500"
-                onClick={handleGenerateAIQuiz}
-                isLoading={isGenerating}
-              >
-                Tạo bài kiểm tra
-              </Button>
-            </div>
-          </div>
+      {/* Error */}
+      {isError && (
+        <Alert variant="destructive">
+          <AlertCircle className="size-4" />
+          <AlertTitle>Lỗi</AlertTitle>
+          <AlertDescription className="flex items-center gap-3">
+            Không tải được danh sách quiz.
+            <Button variant="outline" size="sm" onClick={() => refetch()}>
+              Thử lại
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Loading */}
+      {isLoading && (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <QuizCardSkeleton key={i} />
+          ))}
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {MOCK_QUIZZES.map((quiz) => (
-          <Card key={quiz.id} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="p-3 bg-indigo-50 rounded-lg">
-                  <CheckSquare className="h-6 w-6 text-indigo-600" />
-                </div>
-                {quiz.score !== null && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Đã làm: {quiz.score}/100
-                  </span>
-                )}
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">{quiz.title}</h3>
-              <p className="text-sm text-gray-500 mb-4">{quiz.subject}</p>
-              
-              <div className="flex items-center space-x-4 text-sm text-gray-600 mb-6">
-                <div className="flex items-center">
-                  <CheckSquare className="h-4 w-4 mr-1 text-gray-400" />
-                  {quiz.questions} câu
-                </div>
-                <div className="flex items-center">
-                  <Clock className="h-4 w-4 mr-1 text-gray-400" />
-                  {quiz.time} phút
-                </div>
-              </div>
+      {/* Empty */}
+      {!isLoading && !isError && quizzes.length === 0 && (
+        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed py-20 text-center">
+          <Sparkles className="mb-4 size-10 text-muted-foreground/40" />
+          <p className="text-lg font-medium text-muted-foreground">
+            Chưa có quiz nào
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Mở một tài liệu và dùng AI để tạo bộ câu hỏi.
+          </p>
+        </div>
+      )}
 
-              <Link to={`/quiz/${quiz.id}`}>
-                <Button variant={quiz.score !== null ? 'outline' : 'primary'} className="w-full">
-                  {quiz.score !== null ? 'Làm lại' : 'Bắt đầu làm bài'}
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {/* List */}
+      {!isLoading && quizzes.length > 0 && (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {quizzes.map((quiz) => (
+            <QuizCard key={quiz.id} quiz={quiz} />
+          ))}
+        </div>
+      )}
     </div>
-  );
+  )
 }
