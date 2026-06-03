@@ -89,9 +89,8 @@ function formatDate(iso: string): string {
   })
 }
 
-function PdfPreview({ documentId }: { documentId: string }) {
+function PdfPreview({ fileUrl }: { fileUrl: string }) {
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const [fileUrl, setFileUrl] = useState("")
   const [numPages, setNumPages] = useState(0)
   const [pageWidth, setPageWidth] = useState(800)
   const [loadError, setLoadError] = useState("")
@@ -115,48 +114,9 @@ function PdfPreview({ documentId }: { documentId: string }) {
   }, [])
 
   useEffect(() => {
-    let cancelled = false
-    let objectUrl = ""
-
-    async function loadPdf() {
-      setFileUrl("")
-      setNumPages(0)
-      setLoadError("")
-
-      try {
-        const response = await api.get(API_ROUTES.DOCUMENTS.DOWNLOAD(documentId), {
-          responseType: "blob",
-        })
-
-        if (cancelled) return
-
-        const blob =
-          response.data instanceof Blob
-            ? response.data
-            : new Blob([response.data], { type: "application/pdf" })
-
-        objectUrl = URL.createObjectURL(blob)
-        setFileUrl(objectUrl)
-      } catch (error) {
-        if (cancelled) return
-
-        const message = isAxiosError(error)
-          ? (error.response?.data as { error?: string })?.error ?? error.message
-          : "Khong the tai PDF."
-
-        setLoadError(message)
-      }
-    }
-
-    loadPdf()
-
-    return () => {
-      cancelled = true
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl)
-      }
-    }
-  }, [documentId])
+    setNumPages(0)
+    setLoadError("")
+  }, [fileUrl])
 
   if (loadError) {
     return (
@@ -424,7 +384,7 @@ export function DocumentDetail() {
           </CardHeader>
           <CardContent className="min-h-0 flex-1 p-0">
             {isPdf ? (
-              <PdfPreview documentId={doc.id} />
+              <PdfPreview fileUrl={doc.presignedUrl || doc.downloadUrl} />
             ) : (
               <div className="space-y-4 p-6">
                 <p className="text-sm text-muted-foreground">
