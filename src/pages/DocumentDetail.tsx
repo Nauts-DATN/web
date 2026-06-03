@@ -68,7 +68,7 @@ import type { Note } from "@/types/db/note"
 import { isAxiosError } from "axios"
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "react-pdf/node_modules/pdfjs-dist/build/pdf.worker.min.mjs",
+  "pdfjs-dist/build/pdf.worker.min.mjs",
   import.meta.url
 ).toString()
 
