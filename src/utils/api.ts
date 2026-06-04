@@ -20,6 +20,14 @@ const api: AxiosInstance = axios.create({
   baseURL,
 })
 
+type RefreshData = {
+  accessToken: string
+  refreshToken: string
+  user?: unknown
+}
+
+let refreshPromise: Promise<RefreshData> | null = null
+
 api.interceptors.request.use((config) => {
   const token = Persistence.getItem<string>(AUTH_TOKEN_KEY)
   if (token) {
@@ -32,6 +40,39 @@ type RetryableRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean
 }
 
+function isAuthRetryExcluded(url?: string): boolean {
+  return (
+    url?.includes("/api/auth/login") ||
+    url?.includes("/api/auth/refresh")
+  ) ?? false
+}
+
+async function refreshAccessToken(refreshToken: string): Promise<RefreshData> {
+  if (!refreshPromise) {
+    refreshPromise = axios
+      .post(`${baseURL}/api/auth/refresh`, { refreshToken })
+      .then((response) => {
+        const data = response.data?.data as RefreshData | undefined
+        if (!data?.accessToken || !data?.refreshToken) {
+          throw new Error("Invalid refresh response")
+        }
+
+        Persistence.setItem(AUTH_TOKEN_KEY, data.accessToken)
+        Persistence.setItem(AUTH_REFRESH_TOKEN_KEY, data.refreshToken)
+        if (data.user) {
+          Persistence.setItem(AUTH_USER_KEY, data.user)
+        }
+
+        return data
+      })
+      .finally(() => {
+        refreshPromise = null
+      })
+  }
+
+  return refreshPromise
+}
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -42,8 +83,7 @@ api.interceptors.response.use(
       status !== 401 ||
       !originalRequest ||
       originalRequest._retry ||
-      originalRequest.url?.includes("/api/auth/login") ||
-      originalRequest.url?.includes("/api/auth/refresh")
+      isAuthRetryExcluded(originalRequest.url)
     ) {
       return Promise.reject(error)
     }
@@ -56,21 +96,7 @@ api.interceptors.response.use(
     originalRequest._retry = true
 
     try {
-      const response = await axios.post(
-        `${baseURL}/api/auth/refresh`,
-        { refreshToken },
-      )
-      const data = response.data?.data
-      if (!data?.accessToken || !data?.refreshToken) {
-        throw new Error("Invalid refresh response")
-      }
-
-      Persistence.setItem(AUTH_TOKEN_KEY, data.accessToken)
-      Persistence.setItem(AUTH_REFRESH_TOKEN_KEY, data.refreshToken)
-      if (data.user) {
-        Persistence.setItem(AUTH_USER_KEY, data.user)
-      }
-
+      const data = await refreshAccessToken(refreshToken)
       originalRequest.headers.Authorization = `Bearer ${data.accessToken}`
       return api(originalRequest)
     } catch (refreshError) {
