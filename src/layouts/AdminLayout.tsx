@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { useAuth } from "@/context/AuthContext"
 
 const adminNavigation = [
-  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { name: "Trang chủ", href: "/admin", icon: LayoutDashboard },
   { name: "Người dùng", href: "/admin/users", icon: Users },
   { name: "Loại tài liệu", href: "/admin/categories", icon: BookOpen },
 ]
