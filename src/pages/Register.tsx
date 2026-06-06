@@ -12,10 +12,16 @@ export function Register() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (password !== confirmPassword) {
+      toast.error("Mật khẩu xác nhận không khớp.")
+      return
+    }
+
     setIsLoading(true)
     try {
       const res = await register(name, email, password)
@@ -70,6 +76,20 @@ export function Register() {
           autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+        />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="register-confirm-password">
+          Xác nhận mật khẩu
+        </FieldLabel>
+        <Input
+          id="register-confirm-password"
+          type="password"
+          required
+          autoComplete="new-password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           placeholder="••••••••"
         />
       </Field>
