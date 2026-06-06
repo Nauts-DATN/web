@@ -92,6 +92,7 @@ function formatDate(iso: string): string {
 function PdfPreview({ fileUrl }: { fileUrl: string }) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [numPages, setNumPages] = useState(0)
+  const [currentPage, setCurrentPage] = useState(1)
   const [pageWidth, setPageWidth] = useState(800)
   const [loadError, setLoadError] = useState("")
 
@@ -115,6 +116,7 @@ function PdfPreview({ fileUrl }: { fileUrl: string }) {
 
   useEffect(() => {
     setNumPages(0)
+    setCurrentPage(1)
     setLoadError("")
   }, [fileUrl])
 
@@ -139,6 +141,33 @@ function PdfPreview({ fileUrl }: { fileUrl: string }) {
       ref={containerRef}
       className="h-[100vh] max-h-[900px] min-h-[520px] w-full overflow-y-auto overflow-x-hidden rounded-b-xl bg-muted/30 p-4"
     >
+      {numPages > 0 && (
+        <div className="sticky top-0 z-10 mb-4 flex flex-wrap items-center justify-center gap-3 rounded-lg border bg-background/95 p-2 shadow-sm backdrop-blur">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={currentPage <= 1}
+            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+          >
+            Trang trước
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Trang {currentPage} / {numPages}
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={currentPage >= numPages}
+            onClick={() =>
+              setCurrentPage((page) => Math.min(numPages, page + 1))
+            }
+          >
+            Trang sau
+          </Button>
+        </div>
+      )}
       <PdfDocument
         file={fileUrl}
         loading={<Skeleton className="h-[480px] w-full" />}
@@ -152,16 +181,17 @@ function PdfPreview({ fileUrl }: { fileUrl: string }) {
         }}
         onLoadSuccess={({ numPages }) => {
           setNumPages(numPages)
+          setCurrentPage(1)
         }}
       >
-        <div className="flex flex-col items-center gap-4">
-          {Array.from({ length: numPages }, (_, index) => (
+        <div className="flex justify-center">
+          {numPages > 0 && (
             <Page
-              key={`page-${index + 1}`}
-              pageNumber={index + 1}
+              key={`page-${currentPage}`}
+              pageNumber={currentPage}
               width={pageWidth}
             />
-          ))}
+          )}
         </div>
       </PdfDocument>
     </div>
