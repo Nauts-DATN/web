@@ -195,9 +195,9 @@ export function Library() {
       {!isLoading && !isError && courses.length === 0 && (
         <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-16 text-center text-muted-foreground">
           <BookOpen className="size-10 opacity-40" />
-          <p className="text-sm">Chưa có course nào.</p>
+          <p className="text-sm">Chưa có môn học nào.</p>
           <Button variant="outline" size="sm" onClick={() => setDialogOpen(true)}>
-            Tạo course đầu tiên
+            Tạo môn học đầu tiên
           </Button>
         </div>
       )}
@@ -253,7 +253,7 @@ export function Library() {
                     <div className="space-y-3 border-t pt-4">
                       {documents.length === 0 ? (
                         <div className="rounded-xl border border-dashed py-10 text-center text-sm text-muted-foreground">
-                          Course này chưa có tài liệu.
+                          Môn học này chưa có tài liệu.
                         </div>
                       ) : (
                         documents.map((doc) => (
@@ -329,7 +329,7 @@ export function Library() {
                 rows={3}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Mô tả ngắn cho course"
+                placeholder="Mô tả ngắn cho môn học (tùy chọn)"
               />
             </div>
 
