@@ -30,7 +30,7 @@ import {
 import { TooltipProvider } from "@/components/ui/tooltip"
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Trang chủ", href: "/dashboard", icon: LayoutDashboard },
   { name: "Tài liệu của tôi", href: "/documents", icon: FileText },
   { name: "Roadmap", href: "/roadmaps", icon: BookOpenCheck },
   { name: "Luyện tập", href: "/quiz", icon: CheckSquare },
