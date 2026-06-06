@@ -141,33 +141,6 @@ function PdfPreview({ fileUrl }: { fileUrl: string }) {
       ref={containerRef}
       className="h-[100vh] max-h-[900px] min-h-[520px] w-full overflow-y-auto overflow-x-hidden rounded-b-xl bg-muted/30 p-4"
     >
-      {numPages > 0 && (
-        <div className="sticky top-0 z-10 mb-4 flex flex-wrap items-center justify-center gap-3 rounded-lg border bg-background/95 p-2 shadow-sm backdrop-blur">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={currentPage <= 1}
-            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
-          >
-            Trang trước
-          </Button>
-          <span className="text-sm text-muted-foreground">
-            Trang {currentPage} / {numPages}
-          </span>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={currentPage >= numPages}
-            onClick={() =>
-              setCurrentPage((page) => Math.min(numPages, page + 1))
-            }
-          >
-            Trang sau
-          </Button>
-        </div>
-      )}
       <PdfDocument
         file={fileUrl}
         loading={<Skeleton className="h-[480px] w-full" />}
@@ -194,6 +167,33 @@ function PdfPreview({ fileUrl }: { fileUrl: string }) {
           )}
         </div>
       </PdfDocument>
+      {numPages > 0 && (
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3 rounded-lg border bg-background/95 p-2 shadow-sm">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={currentPage <= 1}
+            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+          >
+            Trang trước
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Trang {currentPage} / {numPages}
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={currentPage >= numPages}
+            onClick={() =>
+              setCurrentPage((page) => Math.min(numPages, page + 1))
+            }
+          >
+            Trang sau
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
