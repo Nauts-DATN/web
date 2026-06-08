@@ -82,7 +82,10 @@ export const useDeleteQuiz = (documentId: string) => {
   return useMutation<unknown, Error, string>({
     mutationFn: (quizId) => aiService.deleteQuiz(quizId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: aiKeys.quizzesByDoc(documentId) })
+      queryClient.invalidateQueries({ queryKey: aiKeys.quizzes() })
+      if (documentId) {
+        queryClient.invalidateQueries({ queryKey: aiKeys.quizzesByDoc(documentId) })
+      }
     },
   })
 }

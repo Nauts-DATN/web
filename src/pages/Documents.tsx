@@ -242,10 +242,10 @@ function UploadDialog({ open, onOpenChange }: UploadDialogProps) {
           {/* Category + Course */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>Danh mục</Label>
+              <Label>Loại tài liệu</Label>
               <Select value={categoryId} onValueChange={setCategoryId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Chọn danh mục" />
+                  <SelectValue placeholder="Chọn loại tài liệu" />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((c) => (
@@ -377,10 +377,6 @@ export function Documents() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </InputGroup>
-        <Button variant="outline" className="shrink-0 gap-2">
-          <Filter className="size-4" />
-          Lọc
-        </Button>
       </div>
 
       {/* Loading */}

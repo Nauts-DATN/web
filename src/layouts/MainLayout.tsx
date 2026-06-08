@@ -9,9 +9,13 @@ import {
   TrendingUp,
   User,
   LogOut,
-  Globe
+  Globe,
+  Moon,
+  Sun,
 } from "lucide-react"
+import { useTheme } from "next-themes"
 import { useAuth } from "@/context/AuthContext"
+import { Button } from "@/components/ui/button"
 import {
   Sidebar,
   SidebarContent,
@@ -41,6 +45,8 @@ const navigation = [
 export function MainLayout() {
   const { user, logout } = useAuth()
   const location = useLocation()
+  const { resolvedTheme, setTheme } = useTheme()
+  const isDark = resolvedTheme === "dark"
 
   if (!user) {
     return <Navigate to="/login" replace />
@@ -56,19 +62,39 @@ export function MainLayout() {
           <SidebarHeader className="border-b border-sidebar-border">
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton size="lg" asChild>
-                  <Link to="/dashboard">
-                    <div className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                      <BookOpen className="size-4" />
-                    </div>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">EduAI</span>
-                      <span className="truncate text-xs text-muted-foreground">
-                        Học tập thông minh
-                      </span>
-                    </div>
-                  </Link>
-                </SidebarMenuButton>
+                <div className="flex items-center gap-2">
+                  <SidebarMenuButton size="lg" asChild>
+                    <Link to="/" className="min-w-0 flex-1">
+                      <div className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                        <BookOpen className="size-4" />
+                      </div>
+                      <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-semibold">EduAI</span>
+                        <span className="truncate text-xs text-muted-foreground">
+                          Học tập thông minh
+                        </span>
+                      </div>
+                    </Link>
+                  </SidebarMenuButton>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon-sm"
+                    className="h-8 w-8 group-data-[collapsible=icon]:hidden"
+                    aria-label={
+                      isDark
+                        ? "Chuyển sang giao diện sáng"
+                        : "Chuyển sang giao diện tối"
+                    }
+                    onClick={() => setTheme(isDark ? "light" : "dark")}
+                  >
+                    {isDark ? (
+                      <Sun className="size-4" />
+                    ) : (
+                      <Moon className="size-4" />
+                    )}
+                  </Button>
+                </div>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarHeader>

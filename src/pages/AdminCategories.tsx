@@ -143,13 +143,13 @@ export function AdminCategories() {
         </div>
         <Button className="gap-2" onClick={openCreateDialog}>
           <Plus className="size-4" />
-          Thêm category
+          Thêm loại tài liệu
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Danh sách category</CardTitle>
+          <CardTitle>Danh sách loại tài liệu</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -166,11 +166,11 @@ export function AdminCategories() {
             </div>
           ) : isError ? (
             <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-center text-sm text-destructive">
-              Không thể tải danh sách category.
+              Không thể tải danh sách loại tài liệu.
             </div>
           ) : categories.length === 0 ? (
             <div className="rounded-xl border border-dashed py-12 text-center text-sm text-muted-foreground">
-              Chưa có category nào.
+              Chưa có loại tài liệu nào.
             </div>
           ) : (
             <Table>
@@ -243,17 +243,17 @@ export function AdminCategories() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <DialogHeader>
               <DialogTitle>
-                {categoryToEdit ? "Sửa category" : "Thêm category"}
+                {categoryToEdit ? "Sửa loại tài liệu" : "Thêm loại tài liệu"}
               </DialogTitle>
             </DialogHeader>
 
             <div className="space-y-1.5">
-              <Label htmlFor="category-name">Tên category</Label>
+              <Label htmlFor="category-name">Tên loại tài liệu</Label>
               <Input
                 id="category-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Ví dụ: Lập trình"
+                placeholder="Tên loại tài liệu"
               />
             </div>
 
@@ -264,7 +264,7 @@ export function AdminCategories() {
                 rows={3}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Mô tả ngắn cho category"
+                placeholder="Mô tả ngắn cho loại tài liệu (tùy chọn)"
               />
             </div>
 

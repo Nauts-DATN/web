@@ -234,7 +234,7 @@ export function Notes() {
             <Search className="text-muted-foreground" />
           </InputGroupAddon>
           <InputGroupInput
-            placeholder="Tìm kiếm tài liệu hoặc ghi chú..."
+            placeholder="Tìm kiếm ghi chú..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />

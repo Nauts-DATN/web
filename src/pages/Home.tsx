@@ -31,7 +31,7 @@ export function Home() {
 
         <div className="space-y-4">
           <h1 className="text-4xl font-semibold tracking-tight text-foreground md:text-6xl">
-            Sẵn sàng tiếp tục học tập?
+            Sẵn sàng học tập?
           </h1>
           <p className="mx-auto max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
             Quản lý tài liệu, ghi chú, bài luyện tập và roadmap học tập của bạn
