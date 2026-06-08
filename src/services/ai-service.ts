@@ -13,6 +13,7 @@ import api from "@/utils/api"
 export type GenerateQuizPayload = {
   questionType: "multiple_choice" | "essay"
   count?: number
+  additionalPrompt?: string
 }
 
 export type SubmitQuizAttemptPayload = {
