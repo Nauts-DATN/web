@@ -217,6 +217,7 @@ export function DocumentDetail() {
     "multiple_choice",
   )
   const [quizCount, setQuizCount] = useState(5)
+  const [additionalPrompt, setAdditionalPrompt] = useState("")
   const [noteOpen, setNoteOpen] = useState(false)
   const [editingNote, setEditingNote] = useState<Note | null>(null)
   const [noteTitle, setNoteTitle] = useState("")
@@ -239,6 +240,7 @@ export function DocumentDetail() {
       const res = await generateQuizMutation.mutateAsync({
         questionType,
         count: quizCount,
+        additionalPrompt: additionalPrompt.trim() || undefined,
       })
       if (!res.isSuccess || !res.data) return
       const quiz = res.data
@@ -545,6 +547,16 @@ export function DocumentDetail() {
                       Math.min(20, Math.max(1, Number(e.target.value))),
                     )
                   }
+                />
+              </Field>
+
+              <Field>
+                <FieldLabel>Yêu cầu</FieldLabel>
+                <Textarea
+                  rows={4}
+                  value={additionalPrompt}
+                  onChange={(e) => setAdditionalPrompt(e.target.value)}
+                  placeholder="Ví dụ: Chỉ tạo câu hỏi về chương 2"
                 />
               </Field>
 
