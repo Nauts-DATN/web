@@ -22,6 +22,7 @@ export type Quiz = {
   createdBy: string
   questionType: "multiple_choice" | "essay"
   questions: QuizQuestion[]
+  latestAttempt?: QuizAttempt | null
   createdAt: string
   updatedAt: string
 }
@@ -29,6 +30,26 @@ export type Quiz = {
 /** Trả về từ POST /documents/:id/quiz — có thêm documentTitle */
 export type QuizResult = Quiz & { documentTitle: string }
 
+export type QuizAttemptAnswer = {
+  questionId: string
+  selectedOption?: number
+  text?: string
+  isCorrect?: boolean
+}
+
+export type QuizAttempt = {
+  id: string
+  quizId: string
+  userId: string
+  score: number | null
+  correctCount: number | null
+  totalQuestions: number
+  answers: QuizAttemptAnswer[]
+  createdAt: string
+  updatedAt: string
+}
+
 export type QuizListRes = ApiResponse<{ quizzes: Quiz[] }>
 export type QuizRes = ApiResponse<{ quiz: Quiz }>
 export type GenerateQuizRes = ApiResponse<QuizResult>
+export type SubmitQuizAttemptRes = ApiResponse<{ attempt: QuizAttempt }>

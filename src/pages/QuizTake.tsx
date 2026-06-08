@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils"
 import { CheckCircle2, XCircle, Lightbulb } from "lucide-react"
 import { toast } from "sonner"
 import type { QuizQuestion } from "@/types/db/quiz"
+import { useSubmitQuizAttempt } from "@/hooks/queries/ai-hooks"
 
 type QuizState = {
   id: string
@@ -49,10 +50,11 @@ export function QuizTake() {
   useParams()
   const navigate = useNavigate()
   const location = useLocation()
-  console.log("Location:", location.state);
+  // console.log("Location:", location.state);
   const quizData: QuizState = location.state?.quiz 
 
   const isEssay = quizData.questionType === "essay"
+  const submitAttemptMutation = useSubmitQuizAttempt(quizData.id)
 
   const [currentQuestion, setCurrentQuestion] = useState(0)
   /** multiple_choice: số index đã chọn; essay: không dùng */
@@ -80,8 +82,22 @@ export function QuizTake() {
     setRevealedAnswers((prev) => new Set([...prev, questionId]))
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (isEssay) {
+      try {
+        await submitAttemptMutation.mutateAsync({
+          score: null,
+          correctCount: null,
+          totalQuestions: quizData.questions.length,
+          answers: quizData.questions.map((q) => ({
+            questionId: q.id,
+            text: essayAnswers[q.id] ?? "",
+          })),
+        })
+      } catch {
+        toast.error("Không lưu được kết quả làm bài.")
+        return
+      }
       setIsSubmitted(true)
       toast.success("Đã nộp bài! Xem gợi ý trả lời mẫu bên dưới.")
       return
@@ -91,7 +107,25 @@ export function QuizTake() {
     quizData.questions.forEach((q) => {
       if (q.answer !== undefined && mcAnswers[q.id] === q.answer) correct++
     })
-    setScore(Math.round((correct / quizData.questions.length) * 100))
+    const nextScore = Math.round((correct / quizData.questions.length) * 100)
+
+    try {
+      await submitAttemptMutation.mutateAsync({
+        score: nextScore,
+        correctCount: correct,
+        totalQuestions: quizData.questions.length,
+        answers: quizData.questions.map((q) => ({
+          questionId: q.id,
+          selectedOption: mcAnswers[q.id],
+          isCorrect: q.answer !== undefined && mcAnswers[q.id] === q.answer,
+        })),
+      })
+    } catch {
+      toast.error("Không lưu được kết quả làm bài.")
+      return
+    }
+
+    setScore(nextScore)
     setIsSubmitted(true)
     toast.success("Đã nộp bài thành công!")
   }
@@ -341,8 +375,9 @@ export function QuizTake() {
         {currentQuestion === quizData.questions.length - 1 ? (
           <Button
             onClick={handleSubmit}
+            disabled={submitAttemptMutation.isPending}
           >
-            Nộp bài
+            {submitAttemptMutation.isPending ? "Đang nộp..." : "Nộp bài"}
           </Button>
         ) : (
           <Button onClick={() => setCurrentQuestion((prev) => prev + 1)}>
