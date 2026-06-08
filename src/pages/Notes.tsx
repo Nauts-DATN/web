@@ -178,6 +178,7 @@ export function Notes() {
       if (editing) {
         await updateNote.mutateAsync({
           id: editing.id,
+          documentId: editing.documentId,
           payload: { title: title.trim(), content },
         })
         toast.success("Cập nhật ghi chú thành công")
@@ -201,7 +202,7 @@ export function Notes() {
 
   const onDelete = async (id: string) => {
     try {
-      await deleteNote.mutateAsync(id)
+      await deleteNote.mutateAsync({ id })
       toast.success("Đã xóa ghi chú")
     } catch (e) {
       const msg = isAxiosError(e)
