@@ -36,20 +36,34 @@ export const useCreateNote = () => {
 
 export const useUpdateNote = () => {
   const queryClient = useQueryClient()
-  return useMutation<NoteRes, Error, { id: string; payload: NoteBodyPartial }>({
+  return useMutation<
+    NoteRes,
+    Error,
+    { id: string; payload: NoteBodyPartial; documentId?: string }
+  >({
     mutationFn: ({ id, payload }) => noteService.update(id, payload),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: noteKeys.list() })
+      if (variables.documentId) {
+        queryClient.invalidateQueries({
+          queryKey: noteKeys.byDocument(variables.documentId),
+        })
+      }
     },
   })
 }
 
 export const useDeleteNote = () => {
   const queryClient = useQueryClient()
-  return useMutation<unknown, Error, string>({
-    mutationFn: noteService.deleteById,
-    onSuccess: () => {
+  return useMutation<unknown, Error, { id: string; documentId?: string }>({
+    mutationFn: ({ id }) => noteService.deleteById(id),
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: noteKeys.list() })
+      if (variables.documentId) {
+        queryClient.invalidateQueries({
+          queryKey: noteKeys.byDocument(variables.documentId),
+        })
+      }
     },
   })
 }

@@ -297,6 +297,7 @@ export function DocumentDetail() {
       if (editingNote) {
         await updateNoteMutation.mutateAsync({
           id: editingNote.id,
+          documentId: id,
           payload: {
             title: noteTitle.trim(),
             content: noteContent,
@@ -322,7 +323,7 @@ export function DocumentDetail() {
 
   const handleDeleteNote = async (noteId: string) => {
     try {
-      await deleteNoteMutation.mutateAsync(noteId)
+      await deleteNoteMutation.mutateAsync({ id: noteId, documentId: id })
       toast.success("Đã xóa ghi chú")
     } catch (e) {
       const msg = isAxiosError(e)
