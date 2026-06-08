@@ -1,11 +1,32 @@
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { CheckSquare, PenLine, FileText, Sparkles, AlertCircle } from "lucide-react"
-import { useQuizzes } from "@/hooks/queries/ai-hooks"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  CheckSquare,
+  PenLine,
+  FileText,
+  Sparkles,
+  AlertCircle,
+  MoreVertical,
+} from "lucide-react"
+import { useDeleteQuiz, useQuizzes } from "@/hooks/queries/ai-hooks"
 import type { Quiz } from "@/types/db/quiz"
 
 function formatDate(iso: string): string {
@@ -18,9 +39,14 @@ function formatDate(iso: string): string {
   })
 }
 
-function QuizCard({ quiz }: { quiz: Quiz }) {
+function QuizCard({
+  quiz,
+  onRequestDelete,
+}: {
+  quiz: Quiz
+  onRequestDelete: (quiz: Quiz) => void
+}) {
   const navigate = useNavigate()
-
   const isMc = quiz.questionType === "multiple_choice"
 
   const handleStart = () => {
@@ -47,9 +73,31 @@ function QuizCard({ quiz }: { quiz: Quiz }) {
               <PenLine className="size-6" />
             )}
           </div>
-          <Badge variant={isMc ? "secondary" : "outline"} className="shrink-0">
-            {isMc ? "Trắc nghiệm" : "Tự luận"}
-          </Badge>
+          <div className="flex shrink-0 items-center gap-1">
+            <Badge variant={isMc ? "secondary" : "outline"}>
+              {isMc ? "Trắc nghiệm" : "Tự luận"}
+            </Badge>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label="Thao tác quiz"
+                >
+                  <MoreVertical className="size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  variant="destructive"
+                  onSelect={() => onRequestDelete(quiz)}
+                >
+                  Xóa
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
         {quiz.documentTitle ? (
@@ -72,6 +120,7 @@ function QuizCard({ quiz }: { quiz: Quiz }) {
             {formatDate(quiz.createdAt)}
           </span>
         </div>
+
         {quiz.latestAttempt && (
           <div className="mt-4 rounded-lg border bg-muted/30 px-3 py-2 text-sm">
             <div className="flex items-center justify-between gap-3">
@@ -92,6 +141,7 @@ function QuizCard({ quiz }: { quiz: Quiz }) {
             )}
           </div>
         )}
+
         <div className="mt-2 flex flex-wrap gap-2">
           <Button className="w-full" onClick={handleStart}>
             {quiz.latestAttempt ? "Làm lại" : "Bắt đầu làm bài"}
@@ -105,7 +155,7 @@ function QuizCard({ quiz }: { quiz: Quiz }) {
 function QuizCardSkeleton() {
   return (
     <Card>
-      <CardContent className="p-6 space-y-4">
+      <CardContent className="space-y-4 p-6">
         <div className="flex items-start justify-between">
           <Skeleton className="size-12 rounded-xl" />
           <Skeleton className="h-6 w-20 rounded-full" />
@@ -120,11 +170,19 @@ function QuizCardSkeleton() {
 
 export function QuizList() {
   const { data: res, isLoading, isError, refetch } = useQuizzes()
+  const deleteMutation = useDeleteQuiz("")
+  const [quizToDelete, setQuizToDelete] = useState<Quiz | null>(null)
   const quizzes = res?.isSuccess ? (res.data?.quizzes ?? []) : []
+
+  function confirmDeleteQuiz() {
+    if (!quizToDelete) return
+    deleteMutation.mutate(quizToDelete.id, {
+      onSuccess: () => setQuizToDelete(null),
+    })
+  }
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
@@ -136,7 +194,6 @@ export function QuizList() {
         </div>
       </div>
 
-      {/* Error */}
       {isError && (
         <Alert variant="destructive">
           <AlertCircle className="size-4" />
@@ -150,7 +207,6 @@ export function QuizList() {
         </Alert>
       )}
 
-      {/* Loading */}
       {isLoading && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -159,7 +215,6 @@ export function QuizList() {
         </div>
       )}
 
-      {/* Empty */}
       {!isLoading && !isError && quizzes.length === 0 && (
         <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed py-20 text-center">
           <Sparkles className="mb-4 size-10 text-muted-foreground/40" />
@@ -172,14 +227,57 @@ export function QuizList() {
         </div>
       )}
 
-      {/* List */}
       {!isLoading && quizzes.length > 0 && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {quizzes.map((quiz) => (
-            <QuizCard key={quiz.id} quiz={quiz} />
+            <QuizCard
+              key={quiz.id}
+              quiz={quiz}
+              onRequestDelete={setQuizToDelete}
+            />
           ))}
         </div>
       )}
+
+      <Dialog
+        open={!!quizToDelete}
+        onOpenChange={(open) => {
+          if (!open) setQuizToDelete(null)
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Xóa quiz?</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-3 text-sm text-muted-foreground">
+            <p className="font-medium text-foreground">
+              {quizToDelete?.documentTitle
+                ? `Quiz: ${quizToDelete.documentTitle}`
+                : "Quiz"}
+            </p>
+            <p>Quiz này sẽ bị xóa vĩnh viễn. Bạn chắc chứ?</p>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setQuizToDelete(null)}
+            >
+              Hủy
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deleteMutation.isPending}
+              onClick={confirmDeleteQuiz}
+            >
+              {deleteMutation.isPending ? "Đang xóa..." : "Xóa"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -261,7 +261,7 @@ export function Roadmaps() {
                 id="roadmap-title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Ví dụ: Học toán cao cấp"
+                placeholder="Tiêu đề roadmap"
               />
             </div>
 
@@ -272,7 +272,7 @@ export function Roadmaps() {
                 rows={3}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Mục tiêu hoặc ghi chú cho lộ trình"
+                placeholder="Mục tiêu hoặc ghi chú cho roadmap (tùy chọn) "
               />
             </div>
 

@@ -57,7 +57,7 @@ export function MainLayout() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton size="lg" asChild>
-                  <Link to="/dashboard">
+                  <Link to="/">
                     <div className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                       <BookOpen className="size-4" />
                     </div>

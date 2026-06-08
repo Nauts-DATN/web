@@ -440,7 +440,7 @@ export function DocumentDetail() {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Sparkles className="size-5 text-violet-600 dark:text-violet-400" />
-                Tóm tắt AI
+                Tóm tắt
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -483,7 +483,7 @@ export function DocumentDetail() {
               ) : (
                 <>
                   <p className="text-sm text-muted-foreground">
-                    AI đọc toàn bộ nội dung PDF và tạo bản tóm tắt có cấu trúc.
+                    AI đọc toàn bộ nội dung tài liệu và tạo bản tóm tắt.
                   </p>
                   <Button
                     className="w-full gap-2"
@@ -556,7 +556,7 @@ export function DocumentDetail() {
                   rows={4}
                   value={additionalPrompt}
                   onChange={(e) => setAdditionalPrompt(e.target.value)}
-                  placeholder="Ví dụ: Chỉ tạo câu hỏi về chương 2"
+                  placeholder="Thêm yêu cầu cụ thể"
                 />
               </Field>
 

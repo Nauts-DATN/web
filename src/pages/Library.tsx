@@ -318,7 +318,7 @@ export function Library() {
                 id="course-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Ví dụ: English"
+                placeholder="Tiêu đề cho môn học"
               />
             </div>
 
