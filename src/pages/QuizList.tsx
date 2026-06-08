@@ -72,9 +72,29 @@ function QuizCard({ quiz }: { quiz: Quiz }) {
             {formatDate(quiz.createdAt)}
           </span>
         </div>
+        {quiz.latestAttempt && (
+          <div className="mt-4 rounded-lg border bg-muted/30 px-3 py-2 text-sm">
+            <div className="flex items-center justify-between gap-3">
+              <span className="font-medium text-foreground">Đã làm</span>
+              {quiz.latestAttempt.score !== null ? (
+                <Badge variant="secondary">
+                  {quiz.latestAttempt.score} điểm
+                </Badge>
+              ) : (
+                <Badge variant="outline">Đã nộp</Badge>
+              )}
+            </div>
+            {quiz.latestAttempt.correctCount !== null && (
+              <p className="mt-1 text-muted-foreground">
+                Đúng {quiz.latestAttempt.correctCount}/
+                {quiz.latestAttempt.totalQuestions} câu
+              </p>
+            )}
+          </div>
+        )}
         <div className="mt-2 flex flex-wrap gap-2">
           <Button className="w-full" onClick={handleStart}>
-            Bắt đầu làm bài
+            {quiz.latestAttempt ? "Làm lại" : "Bắt đầu làm bài"}
           </Button>
         </div>
       </CardContent>

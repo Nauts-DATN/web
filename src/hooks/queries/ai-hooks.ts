@@ -1,7 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import aiService, { type GenerateQuizPayload } from "@/services/ai-service"
+import aiService, {
+  type GenerateQuizPayload,
+  type SubmitQuizAttemptPayload,
+} from "@/services/ai-service"
 import type { SummaryRes } from "@/types/db/document"
-import type { GenerateQuizRes, QuizListRes } from "@/types/db/quiz"
+import type {
+  GenerateQuizRes,
+  QuizListRes,
+  SubmitQuizAttemptRes,
+} from "@/types/db/quiz"
 
 export const aiKeys = {
   summary: (docId: string) => ["ai", "summary", docId] as const,
@@ -59,6 +66,17 @@ export const useGenerateQuiz = (documentId: string) => {
 }
 
 /** Xóa một quiz. */
+export const useSubmitQuizAttempt = (quizId: string) => {
+  const queryClient = useQueryClient()
+  return useMutation<SubmitQuizAttemptRes, Error, SubmitQuizAttemptPayload>({
+    mutationFn: (payload) => aiService.submitQuizAttempt(quizId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: aiKeys.quizzes() })
+      queryClient.invalidateQueries({ queryKey: aiKeys.quiz(quizId) })
+    },
+  })
+}
+
 export const useDeleteQuiz = (documentId: string) => {
   const queryClient = useQueryClient()
   return useMutation<unknown, Error, string>({

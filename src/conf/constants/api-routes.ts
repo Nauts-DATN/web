@@ -51,6 +51,7 @@ const API_ROUTES = {
     QUIZZES: "/api/quizzes",
     /** Chi tiết / xóa một quiz theo id. */
     QUIZ_BY_ID: (id: string) => `/api/quizzes/${id}`,
+    QUIZ_ATTEMPTS: (id: string) => `/api/quizzes/${id}/attempts`,
   },
   NOTES: {
     BASE: "/api/notes",

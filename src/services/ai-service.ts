@@ -1,12 +1,25 @@
 import API_ROUTES from "@/conf/constants/api-routes"
 import type { SummaryRes } from "@/types/db/document"
-import type { GenerateQuizRes, QuizListRes, QuizRes } from "@/types/db/quiz"
+import type {
+  GenerateQuizRes,
+  QuizAttemptAnswer,
+  QuizListRes,
+  QuizRes,
+  SubmitQuizAttemptRes,
+} from "@/types/db/quiz"
 import type { ApiResponse } from "@/types/core/api"
 import api from "@/utils/api"
 
 export type GenerateQuizPayload = {
   questionType: "multiple_choice" | "essay"
   count?: number
+}
+
+export type SubmitQuizAttemptPayload = {
+  score?: number | null
+  correctCount?: number | null
+  totalQuestions: number
+  answers?: QuizAttemptAnswer[]
 }
 
 const aiService = {
@@ -46,6 +59,14 @@ const aiService = {
   /** Chi tiết một quiz. */
   getQuizById: async (quizId: string): Promise<QuizRes> => {
     const res = await api.get(API_ROUTES.AI.QUIZ_BY_ID(quizId))
+    return res.data
+  },
+
+  submitQuizAttempt: async (
+    quizId: string,
+    payload: SubmitQuizAttemptPayload,
+  ): Promise<SubmitQuizAttemptRes> => {
+    const res = await api.post(API_ROUTES.AI.QUIZ_ATTEMPTS(quizId), payload)
     return res.data
   },
 
