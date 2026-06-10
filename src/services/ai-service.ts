@@ -16,6 +16,10 @@ export type GenerateQuizPayload = {
   additionalPrompt?: string
 }
 
+export type SummarizePayload = {
+  additionalPrompt?: string
+}
+
 export type SubmitQuizAttemptPayload = {
   score?: number | null
   correctCount?: number | null
@@ -31,8 +35,11 @@ const aiService = {
   },
 
   /** Gọi AI tóm tắt tài liệu và lưu kết quả vào DB. */
-  summarize: async (documentId: string): Promise<SummaryRes> => {
-    const res = await api.post(API_ROUTES.AI.SUMMARIZE(documentId))
+  summarize: async (
+    documentId: string,
+    payload?: SummarizePayload,
+  ): Promise<SummaryRes> => {
+    const res = await api.post(API_ROUTES.AI.SUMMARIZE(documentId), payload)
     return res.data
   },
 

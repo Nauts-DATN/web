@@ -217,6 +217,7 @@ export function DocumentDetail() {
     "multiple_choice",
   )
   const [quizCount, setQuizCount] = useState(5)
+  const [summaryAdditionalPrompt, setSummaryAdditionalPrompt] = useState("")
   const [additionalPrompt, setAdditionalPrompt] = useState("")
   const [noteOpen, setNoteOpen] = useState(false)
   const [editingNote, setEditingNote] = useState<Note | null>(null)
@@ -225,7 +226,9 @@ export function DocumentDetail() {
 
   const handleSummarize = async () => {
     try {
-      await summarizeMutation.mutateAsync()
+      await summarizeMutation.mutateAsync({
+        additionalPrompt: summaryAdditionalPrompt.trim() || undefined,
+      })
       toast.success("Tóm tắt tài liệu thành công!")
     } catch (e) {
       const msg = isAxiosError(e)
@@ -445,6 +448,16 @@ export function DocumentDetail() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <Field>
+                <FieldLabel>Yêu cầu tóm tắt</FieldLabel>
+                <Textarea
+                  rows={4}
+                  value={summaryAdditionalPrompt}
+                  onChange={(e) => setSummaryAdditionalPrompt(e.target.value)}
+                  placeholder="Yêu cầu thêm cho AI"
+                />
+              </Field>
+
               {doc.summary ? (
                 <>
                   <Accordion
@@ -484,7 +497,7 @@ export function DocumentDetail() {
               ) : (
                 <>
                   <p className="text-sm text-muted-foreground">
-                    AI đọc toàn bộ nội dung tài liệu và tạo bản tóm tắt.
+                    AI đọc nội dung tài liệu và tạo bản tóm tắt.
                   </p>
                   <Button
                     className="w-full gap-2"

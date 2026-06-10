@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import aiService, {
   type GenerateQuizPayload,
+  type SummarizePayload,
   type SubmitQuizAttemptPayload,
 } from "@/services/ai-service"
 import type { SummaryRes } from "@/types/db/document"
@@ -29,8 +30,8 @@ export const useCachedSummary = (documentId: string | undefined) =>
 /** Gọi AI tóm tắt — lưu kết quả vào DB, tự invalidate summary cache. */
 export const useSummarizeDocument = (documentId: string) => {
   const queryClient = useQueryClient()
-  return useMutation<SummaryRes, Error>({
-    mutationFn: () => aiService.summarize(documentId),
+  return useMutation<SummaryRes, Error, SummarizePayload | undefined>({
+    mutationFn: (payload) => aiService.summarize(documentId, payload),
     onSuccess: (data) => {
       queryClient.setQueryData(aiKeys.summary(documentId), data)
       // Invalidate document detail để cập nhật doc.summary
