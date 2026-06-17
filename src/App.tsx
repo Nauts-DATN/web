@@ -20,11 +20,13 @@ import { Notes } from "@/pages/Notes"
 import { QuizList } from "@/pages/QuizList"
 import { QuizTake } from "@/pages/QuizTake"
 import { Profile } from "@/pages/Profile"
+import { SystemReports } from "@/pages/SystemReports"
 import { Roadmaps } from "@/pages/Roadmaps"
 import { RoadmapDetail } from "@/pages/RoadmapDetail"
 import { AdminDashboard } from "@/pages/AdminDashboard"
 import { AdminUsers } from "@/pages/AdminUsers"
 import { AdminCategories } from "@/pages/AdminCategories"
+import { AdminSystemReports } from "@/pages/AdminSystemReports"
 import { Toaster } from "@/components/ui/sonner"
 import { TanStackDevtools } from "@tanstack/react-devtools"
 import { Library } from "./pages/Library"
@@ -57,12 +59,14 @@ export default function App() {
               <Route path="/roadmaps" element={<Roadmaps />} />
               <Route path="/roadmaps/:id" element={<RoadmapDetail />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/system-reports" element={<SystemReports />} />
             </Route>
 
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="categories" element={<AdminCategories />} />
+              <Route path="system-reports" element={<AdminSystemReports />} />
             </Route>
           </Routes>
           <Toaster position="top-right" richColors />

@@ -66,6 +66,13 @@ const API_ROUTES = {
     TASK_COMPLETE: (taskId: string) => `/api/roadmaps/tasks/${taskId}/complete`,
     TASK_DOCUMENT: (taskId: string) => `/api/roadmaps/tasks/${taskId}/document`,
   },
+  SYSTEM_REPORTS: {
+    BASE: "/api/system-reports",
+    MINE: "/api/system-reports/mine",
+    ADMIN: "/api/system-reports/admin",
+    BY_ID: (id: string) => `/api/system-reports/${id}`,
+    COMPLETE: (id: string) => `/api/system-reports/${id}/complete`,
+  },
 } as const
 
 export default API_ROUTES

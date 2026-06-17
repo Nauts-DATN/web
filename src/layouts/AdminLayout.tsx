@@ -1,5 +1,5 @@
 import { Link, Navigate, Outlet, useLocation } from "react-router-dom"
-import { BookOpen, LayoutDashboard, LogOut, Shield, Users } from "lucide-react"
+import { BookOpen, Bug, LayoutDashboard, LogOut, Shield, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/context/AuthContext"
 
@@ -7,6 +7,7 @@ const adminNavigation = [
   { name: "Trang chủ", href: "/admin", icon: LayoutDashboard },
   { name: "Người dùng", href: "/admin/users", icon: Users },
   { name: "Loại tài liệu", href: "/admin/categories", icon: BookOpen },
+  { name: "Lỗi hệ thống", href: "/admin/system-reports", icon: Bug },
 ]
 
 export function AdminLayout() {

@@ -454,7 +454,7 @@ export function DocumentDetail() {
                   rows={4}
                   value={summaryAdditionalPrompt}
                   onChange={(e) => setSummaryAdditionalPrompt(e.target.value)}
-                  placeholder="Yêu cầu thêm cho AI"
+                  placeholder="Yêu cầu phạm vi tóm tắt cho AI"
                 />
               </Field>
 
