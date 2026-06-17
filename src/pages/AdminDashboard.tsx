@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react"
 import { isAxiosError } from "axios"
 import {
+  Bug,
   Camera,
+  CheckCircle2,
   Lock,
   Mail,
   Shield,
-  ShieldCheck,
   User,
   Users,
   UserX,
@@ -31,6 +32,7 @@ import {
   useUpdateUserPassword,
   useUsers,
 } from "@/hooks/queries/user-hooks"
+import { useAdminSystemReports } from "@/hooks/queries/system-report-hooks"
 import type { User as AppUser } from "@/types/db/user"
 
 function getErrorMessage(error: unknown, fallback: string) {
@@ -72,7 +74,9 @@ export function AdminDashboard() {
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
 
-  const { data, isLoading } = useUsers()
+  const { data: usersData, isLoading } = useUsers()
+  const { data: reportsData, isLoading: isLoadingReports } =
+    useAdminSystemReports()
   const updateName = useUpdateUserName()
   const updateAvatar = useUpdateUserAvatar()
   const updatePassword = useUpdateUserPassword()
@@ -81,11 +85,16 @@ export function AdminDashboard() {
     setAvatarUrl(resolveAvatarSrc(user))
   }, [user?.id, user?.avatar])
 
-  const users = data?.isSuccess ? (data.data ?? []) : []
+  const users = usersData?.isSuccess ? (usersData.data ?? []) : []
+  const reports = reportsData?.isSuccess
+    ? (reportsData.data?.reports ?? [])
+    : []
   const totalUsers = users.length
-  const adminUsers = users.filter((item) => item.role === "admin").length
   const blockedUsers = users.filter((item) => item.isBlocked).length
-  const verifiedUsers = users.filter((item) => item.emailVerified).length
+  const totalReports = reports.length
+  const completedReports = reports.filter(
+    (report) => report.status === "completed",
+  ).length
 
   const handleSaveName = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -191,35 +200,6 @@ export function AdminDashboard() {
             <Users className="size-9 text-primary" />
           </CardContent>
         </Card>
-
-        <Card size="sm">
-          <CardContent className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Admin</p>
-              {isLoading ? (
-                <Skeleton className="mt-2 h-8 w-16" />
-              ) : (
-                <p className="mt-2 text-2xl font-semibold">{adminUsers}</p>
-              )}
-            </div>
-            <ShieldCheck className="size-9 text-primary" />
-          </CardContent>
-        </Card>
-
-        <Card size="sm">
-          <CardContent className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Đã xác thực</p>
-              {isLoading ? (
-                <Skeleton className="mt-2 h-8 w-16" />
-              ) : (
-                <p className="mt-2 text-2xl font-semibold">{verifiedUsers}</p>
-              )}
-            </div>
-            <Mail className="size-9 text-primary" />
-          </CardContent>
-        </Card>
-
         <Card size="sm">
           <CardContent className="flex items-center justify-between gap-4">
             <div>
@@ -233,6 +213,38 @@ export function AdminDashboard() {
             <UserX className="size-9 text-destructive" />
           </CardContent>
         </Card>
+
+        <Card size="sm">
+          <CardContent className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Lỗi hệ thống</p>
+              {isLoadingReports ? (
+                <Skeleton className="mt-2 h-8 w-16" />
+              ) : (
+                <p className="mt-2 text-2xl font-semibold">{totalReports}</p>
+              )}
+            </div>
+            <Bug className="size-9 text-primary" />
+          </CardContent>
+        </Card>
+
+        <Card size="sm">
+          <CardContent className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Lỗi đã xử lý</p>
+              {isLoadingReports ? (
+                <Skeleton className="mt-2 h-8 w-16" />
+              ) : (
+                <p className="mt-2 text-2xl font-semibold">
+                  {completedReports}
+                </p>
+              )}
+            </div>
+            <CheckCircle2 className="size-9 text-primary" />
+          </CardContent>
+        </Card>
+
+        
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
