@@ -12,6 +12,7 @@ import {
   Globe,
   Moon,
   Sun,
+  Bug,
 } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useAuth } from "@/context/AuthContext"
@@ -130,6 +131,14 @@ export function MainLayout() {
                   <Link to="/profile">
                     <User />
                     <span>Hồ sơ</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Báo lỗi">
+                  <Link to="/system-reports">
+                    <Bug />
+                    <span>Báo lỗi</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
