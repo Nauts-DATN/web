@@ -17,6 +17,10 @@ export type Document = {
   summary: string | null
   /** Thời điểm tóm tắt lần cuối (null nếu chưa tóm tắt). */
   summarizedAt: string | null
+  ragStatus: "pending" | "processing" | "completed" | "failed" | "skipped"
+  ragIndexedAt: string | null
+  ragError: string | null
+  ragChunkCount: number
   createdAt: string
   updatedAt: string
 }

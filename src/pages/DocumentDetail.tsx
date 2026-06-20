@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+﻿import { useEffect, useRef, useState } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Document as PdfDocument, Page, pdfjs } from "react-pdf"
@@ -89,6 +89,27 @@ function formatDate(iso: string): string {
   })
 }
 
+function getRagStatusLabel(status: string): string {
+  switch (status) {
+    case "processing":
+      return "Đang xử lý nội dung tài liệu"
+    case "completed":
+      return "Tài liệu đã được xử lý"
+    case "failed":
+      return "Xử lý nội dung thất bại"
+    case "skipped":
+      return "PDF scan"
+    default:
+      return "Chờ xử lý nội dung"
+  }
+}
+
+function getRagStatusVariant(status: string) {
+  if (status === "completed") return "secondary" as const
+  if (status === "failed") return "destructive" as const
+  return "outline" as const
+}
+
 function PdfPreview({ fileUrl }: { fileUrl: string }) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [numPages, setNumPages] = useState(0)
@@ -150,7 +171,7 @@ function PdfPreview({ fileUrl }: { fileUrl: string }) {
           </p>
         }
         onLoadError={(error) => {
-          setLoadError(error.message || "Khong the hien thi PDF.")
+          setLoadError(error.message || "Không thể hiển thị PDF.")
         }}
         onLoadSuccess={({ numPages }) => {
           setNumPages(numPages)
@@ -163,6 +184,8 @@ function PdfPreview({ fileUrl }: { fileUrl: string }) {
               key={`page-${currentPage}`}
               pageNumber={currentPage}
               width={pageWidth}
+              // renderTextLayer={false}
+              // renderAnnotationLayer={false}
             />
           )}
         </div>
@@ -223,6 +246,18 @@ export function DocumentDetail() {
   const [editingNote, setEditingNote] = useState<Note | null>(null)
   const [noteTitle, setNoteTitle] = useState("")
   const [noteContent, setNoteContent] = useState("")
+
+  useEffect(() => {
+    if (doc?.mimeType !== "application/pdf" || doc.ragStatus !== "processing") {
+      return
+    }
+
+    const timer = window.setInterval(() => {
+      void refetch()
+    }, 4000)
+
+    return () => window.clearInterval(timer)
+  }, [doc?.mimeType, doc?.ragStatus, refetch])
 
   const handleSummarize = async () => {
     try {
@@ -362,7 +397,7 @@ export function DocumentDetail() {
   if (isError || !apiRes?.isSuccess || !doc) {
     const msg = isAxiosError(error)
       ? (error.response?.data as { error?: string })?.error ?? error.message
-      : "Không tải được tài liệu."
+      : "Không tìm được tài liệu."
     return (
       <div className="space-y-6">
         <Button variant="ghost" size="sm" asChild>
@@ -387,6 +422,17 @@ export function DocumentDetail() {
   const isPdf = doc.mimeType === "application/pdf"
   const quizzes = quizzesRes?.isSuccess ? (quizzesRes.data?.quizzes ?? []) : []
   const notes = notesRes?.isSuccess ? (notesRes.data?.notes ?? []) : []
+  const hasQuizAdditionalPrompt = additionalPrompt.trim().length > 0
+  const isRagBusyForQuiz =
+    isPdf &&
+    hasQuizAdditionalPrompt &&
+    (doc.ragStatus === "pending" || doc.ragStatus === "processing")
+  const isRagFailedForQuiz =
+    isPdf && hasQuizAdditionalPrompt && doc.ragStatus === "failed"
+  const isRagSkippedForQuiz =
+    isPdf && hasQuizAdditionalPrompt && doc.ragStatus === "skipped"
+  const isGenerateQuizDisabled =
+    generateQuizMutation.isPending || isRagBusyForQuiz || isRagFailedForQuiz
 
   return (
     <div className="space-y-8">
@@ -417,6 +463,27 @@ export function DocumentDetail() {
             <p className="text-sm text-muted-foreground">
               {doc.title} · {formatBytes(doc.fileSize)} · {formatDate(doc.updatedAt)}
             </p>
+            {isPdf && (
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant={getRagStatusVariant(doc.ragStatus)}>
+                  {getRagStatusLabel(doc.ragStatus)}
+                </Badge>
+                {doc.ragStatus === "completed" && (
+                  <span className="text-xs text-muted-foreground">
+                    {doc.ragChunkCount} đoạn nội dung
+                    {doc.ragIndexedAt ? ` · ${formatDate(doc.ragIndexedAt)}` : ""}
+                  </span>
+                )}
+                {doc.ragStatus === "failed" && doc.ragError && (
+                  <span className="text-xs text-destructive">{doc.ragError}</span>
+                )}
+                {doc.ragStatus === "skipped" && (
+                  <span className="text-xs text-muted-foreground">
+                    Tài liệu hiện tại là là dạng PDF scan.
+                  </span>
+                )}
+              </div>
+            )}
           </CardHeader>
           <CardContent className="min-h-0 flex-1 p-0">
             {isPdf ? (
@@ -426,7 +493,7 @@ export function DocumentDetail() {
                 <p className="text-sm text-muted-foreground">
                   Định dạng{" "}
                   <span className="font-mono text-xs">{doc.mimeType}</span>{" "}
-                  không xem trực tiếp trong trình duyệt. Dùng nút &quot;Mở
+                  Không xem trực tiếp trong trình duyệt. Dùng nút &quot;Mở
                   file&quot; để tải hoặc mở bằng ứng dụng ngoài.
                 </p>
                 {doc.description && (
@@ -437,9 +504,9 @@ export function DocumentDetail() {
           </CardContent>
         </Card>
 
-        {/* Right sidebar */}
+        {/* Thanh bên */}
         <div className="space-y-6">
-          {/* ── Tóm tắt AI ── */}
+          {/* Tóm tắt AI */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
@@ -512,7 +579,7 @@ export function DocumentDetail() {
             </CardContent>
           </Card>
 
-          {/* ── Tạo Quiz ── */}
+          {/* Tạo câu hỏi */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
@@ -574,10 +641,27 @@ export function DocumentDetail() {
                 />
               </Field>
 
+              {hasQuizAdditionalPrompt && isPdf && (
+                <Alert
+                  variant={isRagFailedForQuiz ? "destructive" : "default"}
+                  className="py-3"
+                >
+                  <AlertDescription className="text-sm">
+                    {doc.ragStatus === "completed"
+                      ? `Tài liệu đã sẵn sàng tìm theo yêu cầu.`
+                      : doc.ragStatus === "failed"
+                        ? `Không thể xử lý nội dung tài liệu: ${doc.ragError ?? "Vui lòng thử lại sau."}`
+                        : isRagSkippedForQuiz
+                          ? "Tài liệu là PDF scan nên chất lượng câu hỏi có thể không cao lắm."
+                          : "Tài liệu đang được xử lý nội dung. Vui lòng thử lại sau khi trạng thái sẵn sàng."}
+                  </AlertDescription>
+                </Alert>
+              )}
+
               <Button
                 className="w-full gap-2"
                 onClick={handleGenerateQuiz}
-                disabled={generateQuizMutation.isPending}
+                disabled={isGenerateQuizDisabled}
               >
                 <Sparkles className="size-4" />
                 {generateQuizMutation.isPending ? "Đang tạo…" : "Tạo Quiz bằng AI"}
@@ -585,7 +669,7 @@ export function DocumentDetail() {
             </CardContent>
           </Card>
 
-          {/* ── Danh sách Quiz đã tạo ── */}
+          {/* Danh sách quiz đã tạo */}
           {(isLoadingQuizzes || quizzes.length > 0) && (
             <Card>
               <CardHeader className="pb-3">
@@ -650,7 +734,7 @@ export function DocumentDetail() {
             </Card>
           )}
 
-          {/* ── Ghi chú ── */}
+          {/* Ghi chú */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg">Ghi chú</CardTitle>
@@ -759,3 +843,4 @@ export function DocumentDetail() {
     </div>
   )
 }
+
