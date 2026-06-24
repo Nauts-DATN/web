@@ -1,5 +1,15 @@
 import { Link, Navigate, Outlet, useLocation } from "react-router-dom"
-import { BookOpen, Bug, LayoutDashboard, LogOut, Shield, Users } from "lucide-react"
+import {
+  BookOpen,
+  Bug,
+  LayoutDashboard,
+  LogOut,
+  Moon,
+  Shield,
+  Sun,
+  Users,
+} from "lucide-react"
+import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/context/AuthContext"
 
@@ -13,6 +23,8 @@ const adminNavigation = [
 export function AdminLayout() {
   const { user, logout } = useAuth()
   const location = useLocation()
+  const { resolvedTheme, setTheme } = useTheme()
+  const isDark = resolvedTheme === "dark"
 
   if (!user) {
     return <Navigate to="/login" replace />
@@ -62,6 +74,24 @@ export function AdminLayout() {
 
         <div className="space-y-2 border-t p-3">
           <Button
+            type="button"
+            variant="outline"
+            className="w-full justify-start gap-2"
+            aria-label={
+              isDark
+                ? "Chuyển sang giao diện sáng"
+                : "Chuyển sang giao diện tối"
+            }
+            onClick={() => setTheme(isDark ? "light" : "dark")}
+          >
+            {isDark ? (
+              <Sun className="size-4" />
+            ) : (
+              <Moon className="size-4" />
+            )}
+            {isDark ? "Giao diện sáng" : "Giao diện tối"}
+          </Button>
+          <Button
             variant="ghost"
             className="w-full justify-start gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
             onClick={() => logout()}
@@ -77,6 +107,23 @@ export function AdminLayout() {
           <Shield className="size-4 text-primary" />
           EduAI Admin
         </Link>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          aria-label={
+            isDark
+              ? "Chuyển sang giao diện sáng"
+              : "Chuyển sang giao diện tối"
+          }
+          onClick={() => setTheme(isDark ? "light" : "dark")}
+        >
+          {isDark ? (
+            <Sun className="size-4" />
+          ) : (
+            <Moon className="size-4" />
+          )}
+        </Button>
         <Button variant="ghost" size="icon-sm" asChild>
           <Link to="/dashboard" aria-label="Về ứng dụng">
             <BookOpen className="size-4" />
