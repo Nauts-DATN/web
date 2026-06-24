@@ -422,6 +422,19 @@ export function DocumentDetail() {
   const isPdf = doc.mimeType === "application/pdf"
   const quizzes = quizzesRes?.isSuccess ? (quizzesRes.data?.quizzes ?? []) : []
   const notes = notesRes?.isSuccess ? (notesRes.data?.notes ?? []) : []
+  const hasSummaryAdditionalPrompt = summaryAdditionalPrompt.trim().length > 0
+  const isRagBusyForSummary =
+    isPdf &&
+    hasSummaryAdditionalPrompt &&
+    (doc.ragStatus === "pending" || doc.ragStatus === "processing")
+  const isRagFailedForSummary =
+    isPdf && hasSummaryAdditionalPrompt && doc.ragStatus === "failed"
+  const isRagSkippedForSummary =
+    isPdf && hasSummaryAdditionalPrompt && doc.ragStatus === "skipped"
+  const shouldShowSummaryRagAlert =
+    hasSummaryAdditionalPrompt && isPdf && doc.ragStatus !== "completed"
+  const isSummarizeDisabled =
+    summarizeMutation.isPending || isRagBusyForSummary
   const hasQuizAdditionalPrompt = additionalPrompt.trim().length > 0
   const isRagBusyForQuiz =
     isPdf &&
@@ -431,6 +444,8 @@ export function DocumentDetail() {
     isPdf && hasQuizAdditionalPrompt && doc.ragStatus === "failed"
   const isRagSkippedForQuiz =
     isPdf && hasQuizAdditionalPrompt && doc.ragStatus === "skipped"
+  const shouldShowQuizRagAlert =
+    hasQuizAdditionalPrompt && isPdf && doc.ragStatus !== "completed"
   const isGenerateQuizDisabled =
     generateQuizMutation.isPending || isRagBusyForQuiz || isRagFailedForQuiz
 
@@ -468,10 +483,9 @@ export function DocumentDetail() {
                 <Badge variant={getRagStatusVariant(doc.ragStatus)}>
                   {getRagStatusLabel(doc.ragStatus)}
                 </Badge>
-                {doc.ragStatus === "completed" && (
+                {doc.ragStatus === "processing" && (
                   <span className="text-xs text-muted-foreground">
-                    {doc.ragChunkCount} đoạn nội dung
-                    {doc.ragIndexedAt ? ` · ${formatDate(doc.ragIndexedAt)}` : ""}
+                    Tài liệu sau khi được xử lý sẽ có thể cho kết quả tóm tắt và câu hỏi chất lượng cao.
                   </span>
                 )}
                 {doc.ragStatus === "failed" && doc.ragError && (
@@ -525,6 +539,21 @@ export function DocumentDetail() {
                 />
               </Field>
 
+              {shouldShowSummaryRagAlert && (
+                <Alert
+                  variant={isRagFailedForSummary ? "destructive" : "default"}
+                  className="py-3"
+                >
+                  <AlertDescription className="text-sm">
+                    {doc.ragStatus === "failed"
+                      ? `Không thể xử lý nội dung tài liệu: ${doc.ragError ?? "Vui lòng thử lại sau."}`
+                      : isRagSkippedForSummary
+                        ? "Tài liệu là PDF scan nên chất lượng tóm tắt có thể không cao."
+                        : "Tài liệu đang được xử lý nội dung. Vui lòng thử lại sau khi trạng thái sẵn sàng."}
+                  </AlertDescription>
+                </Alert>
+              )}
+
               {doc.summary ? (
                 <>
                   <Accordion
@@ -553,7 +582,7 @@ export function DocumentDetail() {
                     size="sm"
                     className="w-full gap-2"
                     onClick={handleSummarize}
-                    disabled={summarizeMutation.isPending}
+                    disabled={isSummarizeDisabled}
                   >
                     <RefreshCw
                       className={`size-4 ${summarizeMutation.isPending ? "animate-spin" : ""}`}
@@ -563,13 +592,10 @@ export function DocumentDetail() {
                 </>
               ) : (
                 <>
-                  <p className="text-sm text-muted-foreground">
-                    AI đọc nội dung tài liệu và tạo bản tóm tắt.
-                  </p>
                   <Button
                     className="w-full gap-2"
                     onClick={handleSummarize}
-                    disabled={summarizeMutation.isPending}
+                    disabled={isSummarizeDisabled}
                   >
                     <Sparkles className="size-4" />
                     {summarizeMutation.isPending ? "Đang tóm tắt…" : "Tóm tắt bằng AI"}
@@ -641,19 +667,17 @@ export function DocumentDetail() {
                 />
               </Field>
 
-              {hasQuizAdditionalPrompt && isPdf && (
+              {shouldShowQuizRagAlert && (
                 <Alert
                   variant={isRagFailedForQuiz ? "destructive" : "default"}
                   className="py-3"
                 >
                   <AlertDescription className="text-sm">
-                    {doc.ragStatus === "completed"
-                      ? `Tài liệu đã sẵn sàng tìm theo yêu cầu.`
-                      : doc.ragStatus === "failed"
-                        ? `Không thể xử lý nội dung tài liệu: ${doc.ragError ?? "Vui lòng thử lại sau."}`
-                        : isRagSkippedForQuiz
-                          ? "Tài liệu là PDF scan nên chất lượng câu hỏi có thể không cao lắm."
-                          : "Tài liệu đang được xử lý nội dung. Vui lòng thử lại sau khi trạng thái sẵn sàng."}
+                    {doc.ragStatus === "failed"
+                      ? `Không thể xử lý nội dung tài liệu: ${doc.ragError ?? "Vui lòng thử lại sau."}`
+                      : isRagSkippedForQuiz
+                        ? "Tài liệu là PDF scan nên chất lượng câu hỏi có thể không cao."
+                        : "Tài liệu đang được xử lý nội dung. Vui lòng thử lại sau khi trạng thái sẵn sàng."}
                   </AlertDescription>
                 </Alert>
               )}
