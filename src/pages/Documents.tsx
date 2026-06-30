@@ -205,7 +205,7 @@ function UploadDialog({ open, onOpenChange }: UploadDialogProps) {
                 <CloudUpload className="size-8 text-muted-foreground" />
                 <div>
                   <p className="text-sm font-medium">Kéo thả hoặc bấm để chọn file</p>
-                  <p className="text-xs text-muted-foreground">Tối đa 50 MB</p>
+                  <p className="text-xs text-muted-foreground">Tối đa 15 MB</p>
                 </div>
               </>
             )}
@@ -491,9 +491,6 @@ export function Documents() {
                       {getCourseName(doc.course) && (
                         <Badge variant="outline">{getCourseName(doc.course)}</Badge>
                       )}
-                      <span className="text-xs text-muted-foreground">
-                        {formatBytes(doc.fileSize)}
-                      </span>
                     </div>
                     <p className="mt-3 text-xs text-muted-foreground">
                       Đã tải lên: {formatDate(doc.createdAt)}
