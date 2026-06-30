@@ -476,7 +476,7 @@ export function DocumentDetail() {
               Xem tài liệu
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              {doc.title} · {formatBytes(doc.fileSize)} · {formatDate(doc.updatedAt)}
+              {doc.title}
             </p>
             {isPdf && (
               <div className="flex flex-wrap items-center gap-2">
